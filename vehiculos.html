@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Parking</title>
+    <link rel="stylesheet" href="/css/style_vehiculos.css">
+</head>
+<body>
+    <div class="main-wrapper">
+        <div class="dashboard-container">
+    
+            <section class="glass-card">
+                <div class="card-header">
+                    <h2>Gestión de Vehículos</h2>
+                    <p>Configuración de tarifas (2 decimales)</p>
+                </div>
+    
+                <form id="form-vehiculo">
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Código</label>
+                            <input type="text" placeholder="P-001" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Tipo de Vehículo</label>
+                            <input type="text" placeholder="Ej: Motocicleta" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Tarifa por Hora (GTQ)</label>
+                            <div class="currency-wrapper">
+                                <span>Q</span>
+                                <input type="number" step="0.01" placeholder="0.00" required>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">GUARDAR TARIFA</button>
+                </form>
+            </section>
+        </div>
+    </div>
+</body>
+</html>
