@@ -7,6 +7,12 @@
     --neon-purple: #9d4edd;
 }
 
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     background: var(--bg-dark);
     background-image: radial-gradient(circle at 50% 50%, #1a0b2e, #0a041a 100%);
@@ -14,6 +20,12 @@ body {
     font-family: 'Inter', sans-serif;
     padding: 20px;
     min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.app-container {
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 header {
@@ -47,5 +59,41 @@ h2 {
 @media (max-width: 1024px) {
     .main-layout {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    header {
+        margin: 0 auto 15px auto;
+    }
+
+    .main-layout {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .glass-panel {
+        padding: 15px;
+        border-radius: 16px;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+        margin-bottom: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 6px;
+    }
+
+    .glass-panel {
+        padding: 12px;
+        border-radius: 12px;
     }
 }

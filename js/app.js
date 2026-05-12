@@ -3,6 +3,7 @@ import './components/AppNav.js';
 import './components/EntryForm.js';
 import './components/SlotsGrid.js';
 import './components/IncomeReports.js';
+import './components/UserProfile.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     CampusStorage.init();
@@ -37,9 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
         mainContent.appendChild(document.createElement('income-reports'));
     };
 
+    const renderProfile = () => {
+        mainContent.innerHTML = '';
+        mainContent.className = 'reports-view';
+        mainContent.style.display = 'block';
+        mainContent.appendChild(document.createElement('user-profile'));
+    };
+
     // Navegación
     window.addEventListener('show-dashboard', renderDashboard);
     window.addEventListener('open-reports', renderReports);
+    window.addEventListener('open-profile', renderProfile);
 
     // Acciones de Datos
     window.addEventListener('add-service', (e) => {
@@ -48,6 +57,17 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('cp_services', JSON.stringify(services));
         refreshSystem();
         renderDashboard();
+    });
+
+    window.addEventListener('update-service', (e) => {
+        const services = JSON.parse(localStorage.getItem('cp_services') || '[]');
+        const index = services.findIndex(s => s.id === e.detail.id);
+        if (index !== -1) {
+            services[index] = e.detail;
+            localStorage.setItem('cp_services', JSON.stringify(services));
+            refreshSystem();
+            renderDashboard();
+        }
     });
 
     window.addEventListener('exit-service', (e) => {

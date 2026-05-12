@@ -89,28 +89,32 @@
     border-color: #9d4edd;
 }
 
-.user-profile {
+.user-profile-btn {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding-left: 15px;
+    padding: 6px 10px 6px 15px;
     border-left: 1px solid rgba(157, 78, 221, 0.2);
+    background: transparent;
+    border: 1px solid rgba(157, 78, 221, 0.4);
+    border-radius: 12px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: all 0.3s ease;
 }
 
-.user-info {
-    text-align: right;
-    line-height: 1.2;
+.user-profile-btn:hover {
+    background: rgba(157, 78, 221, 0.3);
+    border-color: #9d4edd;
 }
 
-.user-info strong {
-    display: block;
+.user-name {
     font-size: 0.85rem;
+    font-weight: 700;
     color: white;
-}
-
-.user-info span {
-    font-size: 0.7rem;
-    color: #b0a0ca;
+    font-family: 'Outfit', sans-serif;
+    pointer-events: none;
 }
 
 .avatar {
@@ -122,4 +126,111 @@
     align-items: center;
     justify-content: center;
     color: white;
+    pointer-events: none;
+}
+
+/* ===== RESPONSIVE MOBILE ===== */
+@media (max-width: 768px) {
+    :host {
+        margin-bottom: 15px;
+    }
+
+    .navbar {
+        flex-wrap: wrap;
+        padding: 10px 12px;
+        gap: 10px;
+        border-radius: 14px;
+    }
+
+    .brand {
+        order: 1;
+    }
+
+    .logo-text {
+        font-size: 0.9rem;
+    }
+
+    .stats-container {
+        order: 3;
+        width: 100%;
+        justify-content: space-around;
+        gap: 8px;
+        padding: 6px 10px;
+    }
+
+    .stat-item {
+        min-width: 40px;
+    }
+
+    .stat-value {
+        font-size: 0.85rem;
+    }
+
+    .stat-label {
+        font-size: 0.5rem;
+    }
+
+    .nav-right {
+        order: 2;
+        gap: 8px;
+    }
+
+    .nav-actions {
+        gap: 5px;
+    }
+
+    .btn-nav {
+        padding: 6px 8px;
+        font-size: 0.65rem;
+    }
+
+    .user-profile-btn {
+        padding: 4px 8px;
+        gap: 6px;
+    }
+
+    .user-name {
+        font-size: 0.7rem;
+    }
+
+    .avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 420px) {
+    .navbar {
+        padding: 8px 10px;
+        gap: 8px;
+        border-radius: 12px;
+    }
+
+    .stats-container {
+        gap: 4px;
+        padding: 5px 6px;
+    }
+
+    .stat-item {
+        min-width: 30px;
+    }
+
+    .stat-value {
+        font-size: 0.75rem;
+    }
+
+    .stat-label {
+        font-size: 0.45rem;
+    }
+
+    .btn-nav {
+        padding: 5px 6px;
+        font-size: 0.6rem;
+    }
+
+    .user-name {
+        display: none;
+    }
 }
