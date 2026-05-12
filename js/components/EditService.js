@@ -1,5 +1,10 @@
+import { translations, getLang } from '../i18n.js';
+
 export class EditService extends HTMLElement {
-    constructor() { super(); this.attachShadow({ mode: 'open' }); }
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+    }
 
     set service(data) {
         this._data = data;
@@ -7,45 +12,99 @@ export class EditService extends HTMLElement {
     }
 
     render() {
-        const types = JSON.parse(localStorage.getItem('cp_types')) || [];
-        this.shadowRoot.innerHTML = `
-            <link rel="stylesheet" href="css/entry-form.css">
-            <div class="form-container">
-                <p style="font-size: 12px; color: #b0a0ca;">EDITANDO SLOT ${this._data.slot}</p>
-                <label>Placa (No editable)</label>
-                <input type="text" value="${this._data.placa}" disabled style="opacity: 0.5">
-                
-                <label>Cambiar Tipo</label>
-                <select id="editType">
-                    ${types.map(t => `<option value="${t.nombre}" ${t.nombre === this._data.tipo ? 'selected' : ''}>${t.nombre}</option>`).join('')}
-                </select>
+        if (!this._data) return;
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
-                    <button id="btnUpdate" style="background: #5a189a; font-size: 12px;">ACTUALIZAR</button>
-                    <button id="btnDelete" style="background: #3c096c; font-size: 12px;">ELIMINAR</button>
+        const t = translations[getLang()] || translations['es'];
+        const entryDate = new Date(this._data.entrada);
+        // Cálculo de horas (mínimo 1 hora)
+        const hours = Math.ceil((new Date() - entryDate) / (1000 * 60 * 60));
+
+        // Tarifas configuradas
+        const rates = { "Automóvil": 15.00, "Moto": 5.00, "Camioneta": 20.00 };
+        const currentRate = rates[this._data.tipo] || 10.00;
+        const total = (hours * currentRate).toFixed(2);
+
+        this.shadowRoot.innerHTML = `
+            <link rel="stylesheet" href="css/style.css">
+            <link rel="stylesheet" href="css/edit-service.css">
+            <div class="modal-overlay">
+                <div class="modal-content glass-panel">
+                    <h3>Gestión Slot ${this._data.slot}</h3>
+                    
+                    <div class="info-grid">
+                        <div class="field">
+                            <label>${t.form_plate}</label>
+                            <input type="text" id="editPlate" value="${this._data.placa}">
+                        </div>
+                        <div class="field">
+                            <label>${t.form_type}</label>
+                            <select id="editType">
+                                <option value="Automóvil" ${this._data.tipo === 'Automóvil' ? 'selected' : ''}>Automóvil</option>
+                                <option value="Moto" ${this._data.tipo === 'Moto' ? 'selected' : ''}>Moto</option>
+                                <option value="Camioneta" ${this._data.tipo === 'Camioneta' ? 'selected' : ''}>Camioneta</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="payment-info">
+                        <p>Tiempo transcurrido: <strong>${hours} hr(s)</strong></p>
+                        <p>Total a cobrar: <span style="color:#deff9a; font-size: 1.4rem;">Q${total}</span></p>
+                    </div>
+
+                    <div class="actions">
+                        <button id="btnUpdate" class="btn-secondary">${t.btn_update}</button>
+                        <button id="btnExit" class="btn-primary">${t.btn_exit}</button>
+                        <button id="btnClose" class="btn-close">${t.btn_cancel}</button>
+                    </div>
                 </div>
-                <hr style="border: 0; border-top: 1px solid rgba(157,78,221,0.2); margin: 15px 0;">
-                <button id="btnGoToPay">GENERAR COBRO (Q${this._data.costo})</button>
             </div>
         `;
-        this.setupEvents();
+
+        this.setupListeners(total);
     }
 
-    setupEvents() {
+    setupListeners(totalAmount) {
+        // Actualizar datos del vehículo
         this.shadowRoot.getElementById('btnUpdate').onclick = () => {
-            const nuevoTipo = this.shadowRoot.getElementById('editType').value;
-            this.dispatchEvent(new CustomEvent('update-req', { detail: { tipo: nuevoTipo }, bubbles: true, composed: true }));
+            const detail = {
+                ...this._data,
+                placa: this.shadowRoot.getElementById('editPlate').value,
+                tipo: this.shadowRoot.getElementById('editType').value
+            };
+            this.dispatchEvent(new CustomEvent('update-service', {
+                detail,
+                bubbles: true,
+                composed: true
+            }));
+            this.remove();
         };
 
-        this.shadowRoot.getElementById('btnDelete').onclick = () => {
-            if (confirm("¿Seguro que desea eliminar este registro?")) {
-                this.dispatchEvent(new CustomEvent('delete-req', { bubbles: true, composed: true }));
-            }
+        // Procesar salida (finalizar servicio)
+        this.shadowRoot.getElementById('btnExit').onclick = () => {
+            const detail = {
+                ...this._data,
+                salida: new Date().toISOString(),
+                total: parseFloat(totalAmount),
+                estado: 'finalizado'
+            };
+            this.dispatchEvent(new CustomEvent('exit-service', {
+                detail,
+                bubbles: true,
+                composed: true
+            }));
+            this.remove();
         };
 
-        this.shadowRoot.getElementById('btnGoToPay').onclick = () => {
-            this.dispatchEvent(new CustomEvent('finish-req', { bubbles: true, composed: true }));
+        // Cerrar modal
+        this.shadowRoot.getElementById('btnClose').onclick = () => this.remove();
+
+        // Cerrar al hacer clic fuera del modal
+        this.shadowRoot.querySelector('.modal-overlay').onclick = (e) => {
+            if (e.target.classList.contains('modal-overlay')) this.remove();
         };
     }
 }
-customElements.define('edit-service', EditService);
+
+if (!customElements.get('edit-service')) {
+    customElements.define('edit-service', EditService);
+}

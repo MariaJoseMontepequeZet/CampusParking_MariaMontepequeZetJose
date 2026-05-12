@@ -1,76 +1,125 @@
+import { translations, getLang } from '../i18n.js';
+
 export class EntryForm extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
+        this._mode = 'insert';
     }
 
-    connectedCallback() {
-        const types = JSON.parse(localStorage.getItem('cp_types')) || [];
+    set editMode(s) {
+        this._mode = 'edit';
+        this._selected = s;
+        this.render();
+    }
+
+    connectedCallback() { this.render(); }
+
+    render() {
+        const t = translations[getLang()] || translations['es'];
+        const isEdit = this._mode === 'edit';
+        let billHTML = '';
+
+        if (isEdit) {
+            const entrada = new Date(this._selected.entrada);
+            const ahora = new Date();
+            const hours = Math.max(1, Math.ceil((ahora - entrada) / (1000 * 60 * 60)));
+            const rates = { "Automóvil": 15, "Moto": 5, "Camioneta": 20, "Bicicleta": 2, "Scooter": 3 };
+            const rate = rates[this._selected.tipo] || 10;
+            const total = (hours * rate).toFixed(2);
+
+            billHTML = `
+                <div class="price-tag" style="color: #deff9a; background: rgba(222, 255, 154, 0.1); padding: 10px; border-radius: 8px; text-align: center; margin: 10px 0;">
+                    Total a cobrar: Q${total} (${hours}h)
+                </div>`;
+        }
+
         this.shadowRoot.innerHTML = `
             <link rel="stylesheet" href="css/entry-form.css">
             <div class="form-container">
-                <label>Placa (Formato: P + 6 caracteres)</label>
-                <input type="text" id="plate" value="P" placeholder="P123ABC" maxlength="7">
+                <h3>${isEdit ? t.edit_title : t.form_title}</h3>
                 
-                <label>Tipo de Vehículo</label>
-                <select id="type">
-                    ${types.map(t => `<option value="${t.nombre}">${t.nombre} - Q${t.tarifa}</option>`).join('')}
+                <label>${t.form_plate}</label>
+                <input type="text" id="placa" placeholder="P-000XXX" value="${isEdit ? this._selected.placa : ''}">
+                
+                <label>${t.form_type}</label>
+                <select id="tipo">
+                    <option value="Automóvil" ${isEdit && this._selected.tipo === 'Automóvil' ? 'selected' : ''}>Automóvil</option>
+                    <option value="Moto" ${isEdit && this._selected.tipo === 'Moto' ? 'selected' : ''}>Moto</option>
+                    <option value="Camioneta" ${isEdit && this._selected.tipo === 'Camioneta' ? 'selected' : ''}>Camioneta</option>
+                    <option value="Bicicleta" ${isEdit && this._selected.tipo === 'Bicicleta' ? 'selected' : ''}>Bicicleta</option>
+                    <option value="Scooter" ${isEdit && this._selected.tipo === 'Scooter' ? 'selected' : ''}>Scooter</option>
                 </select>
 
-                <label>Slot Asignado (1-30)</label>
-                <input type="number" id="slot" placeholder="N° de espacio" min="1" max="30">
+                ${!isEdit ? `<label>${t.form_slot}</label><input type="number" id="slot" min="1" max="20">` : ''}
                 
-                <button id="btnSave">Registrar Ingreso</button>
-            </div>
-        `;
-        this.setupEvents();
+                ${billHTML}
+
+                <button id="mainBtn">${isEdit ? t.btn_update : t.form_btn}</button>
+                
+                ${isEdit ? `
+                    <button id="exitBtn" style="background:#ff4d4d; color:white; border:none; padding:10px; border-radius:8px; width:100%; margin-top:10px; cursor:pointer; font-weight:bold;">
+                        ${t.btn_exit}
+                    </button>
+                    <button id="cancelBtn" style="background:transparent; color:#b0a0ca; border:none; width:100%; margin-top:5px; cursor:pointer;">
+                        ${t.btn_cancel}
+                    </button>` : ''}
+            </div>`;
+
+        this.setupEvents(isEdit);
     }
 
-    setupEvents() {
-        const plateInput = this.shadowRoot.getElementById('plate');
+    setupEvents(isEdit) {
+        this.shadowRoot.getElementById('mainBtn').onclick = () => {
+            const placa = this.shadowRoot.getElementById('placa').value.toUpperCase().trim();
+            const tipo = this.shadowRoot.getElementById('tipo').value;
 
-        // Bloqueo de datos: Asegura que empiece con P y no borre el prefijo
-        plateInput.addEventListener('input', (e) => {
-            let value = e.target.value.toUpperCase();
+            if (isEdit) {
+                this.dispatchEvent(new CustomEvent('update-service', {
+                    detail: { ...this._selected, placa, tipo },
+                    bubbles: true, composed: true
+                }));
+            } else {
+                const slot = parseInt(this.shadowRoot.getElementById('slot').value);
+                if (!placa || !slot) return alert("Datos incompletos");
 
-            // Si el usuario intenta borrar la P o escribir otra cosa al inicio
-            if (!value.startsWith('P')) {
-                value = 'P' + value.replace(/^[^P]+/, '');
+                this.dispatchEvent(new CustomEvent('add-service', {
+                    detail: { placa, tipo, slot, id: Date.now(), estado: 'activo', entrada: new Date().toISOString() },
+                    bubbles: true, composed: true
+                }));
             }
-
-            // Limitar a P + 6 caracteres (Total 7)
-            e.target.value = value.substring(0, 7);
-        });
-
-        this.shadowRoot.getElementById('btnSave').onclick = () => {
-            const plate = plateInput.value.toUpperCase();
-            const slot = this.shadowRoot.getElementById('slot').value;
-
-            // Validación rigurosa de 7 caracteres totales (P + 6)
-            if (plate.length !== 7) {
-                alert("La placa debe tener el formato P seguido de 6 caracteres.");
-                return;
-            }
-
-            if (!slot) {
-                alert("Debe asignar un número de slot.");
-                return;
-            }
-
-            const detail = {
-                placa: plate,
-                tipo: this.shadowRoot.getElementById('type').value,
-                slot: slot,
-                entrada: new Date().toISOString(),
-                estado: 'activo'
-            };
-
-            this.dispatchEvent(new CustomEvent('add-service', { detail, bubbles: true, composed: true }));
-
-            // Resetear manteniendo la P predeterminada
-            plateInput.value = "P";
-            this.shadowRoot.getElementById('slot').value = "";
+            this.clear();
         };
+
+        if (isEdit) {
+            this.shadowRoot.getElementById('cancelBtn').onclick = () => this.clear();
+            this.shadowRoot.getElementById('exitBtn').onclick = () => {
+                const rates = { "Automóvil": 15, "Moto": 5, "Camioneta": 20, "Bicicleta": 2, "Scooter": 3 };
+                const rate = rates[this._selected.tipo] || 10;
+                const hours = Math.max(1, Math.ceil((new Date() - new Date(this._selected.entrada)) / (1000 * 60 * 60)));
+
+                this.dispatchEvent(new CustomEvent('exit-service', {
+                    detail: {
+                        ...this._selected,
+                        estado: 'finalizado',
+                        costo: (hours * rate).toFixed(2),
+                        salida: new Date().toISOString(),
+                        slot: null // LIBERA EL ESPACIO PARA EL CONTADOR
+                    },
+                    bubbles: true, composed: true
+                }));
+                this.clear();
+            };
+        }
+    }
+
+    clear() {
+        this._mode = 'insert';
+        this._selected = null;
+        this.render();
     }
 }
-customElements.define('entry-form', EntryForm);
+
+if (!customElements.get('entry-form')) {
+    customElements.define('entry-form', EntryForm);
+}

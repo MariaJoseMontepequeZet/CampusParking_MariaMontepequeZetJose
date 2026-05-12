@@ -1,36 +1,54 @@
 .form-container {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 15px;
+}
+
+h3 {
+    color: #deff9a;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
 }
 
 label {
-    font-size: 10px;
+    font-size: 0.7rem;
     color: #b0a0ca;
     text-transform: uppercase;
-    font-family: 'Outfit';
-    font-weight: bold;
+    letter-spacing: 1px;
 }
 
 input,
 select {
-    padding: 14px;
+    padding: 12px;
     background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(157, 78, 221, 0.2);
-    color: white;
+    border: 1px solid rgba(157, 78, 221, 0.4);
     border-radius: 12px;
+    color: white;
     outline: none;
-    font-size: 14px;
 }
 
 button {
-    background: linear-gradient(135deg, #9d4edd, #5a189a);
+    background: #9d4edd;
     color: white;
     border: none;
-    padding: 16px;
-    border-radius: 14px;
-    font-weight: 800;
+    padding: 15px;
+    border-radius: 12px;
+    font-weight: bold;
     cursor: pointer;
-    font-family: 'Outfit';
-    margin-top: 10px;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #7b2cbf;
+    box-shadow: 0 0 15px rgba(157, 78, 221, 0.4);
+}
+
+.price-tag {
+    background: rgba(222, 255, 154, 0.1);
+    color: #deff9a;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 800;
+    border: 1px dashed #deff9a;
 }

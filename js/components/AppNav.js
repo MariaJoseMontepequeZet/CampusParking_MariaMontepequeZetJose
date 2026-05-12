@@ -6,18 +6,30 @@ export class AppNav extends HTMLElement {
 
     connectedCallback() {
         this.render();
+        window.addEventListener('storage-update', () => {
+            this.render();
+        });
     }
 
     render() {
         const services = JSON.parse(localStorage.getItem('cp_services')) || [];
-        const activos = services.filter(s => s.estado === 'activo');
 
-        const getCount = (tipo) => activos.filter(s => s.tipo === tipo).length;
+        // FILTRO DE SEGURIDAD: 
+        // 1. Que el estado sea 'activo'.
+        // 2. Que tenga un slot asignado (que no sea null o undefined).
+        const activos = services.filter(s => s.estado === 'activo' && s.slot !== null && s.slot !== undefined);
+
+        // Función de conteo exacta
+        const getCount = (tipo) => {
+            return activos.filter(s => s.tipo && s.tipo.trim() === tipo).length;
+        };
 
         this.shadowRoot.innerHTML = `
             <link rel="stylesheet" href="css/app-nav.css">
             <nav class="navbar">
-                <div class="logo"><span>CAMPUS</span>PARKING</div>
+                <div class="brand">
+                    <span class="logo-text">CAMPUS<span>PARKING</span></span>
+                </div>
                 
                 <div class="stats-container">
                     <div class="stat-item">
@@ -38,7 +50,8 @@ export class AppNav extends HTMLElement {
                     </div>
                     <div class="stat-item">
                         <span class="stat-value">${getCount('Scooter')}</span>
-                        <span class="stat-label">Scoots</span></div>
+                        <span class="stat-label">Scoots</span>
+                    </div>
                 </div>
 
                 <div class="nav-right">
@@ -63,11 +76,15 @@ export class AppNav extends HTMLElement {
 
     setupListeners() {
         this.shadowRoot.getElementById('btnHome').onclick = () => {
-            window.dispatchEvent(new CustomEvent('show-dashboard'));
+            window.dispatchEvent(new CustomEvent('show-dashboard', { bubbles: true, composed: true }));
         };
+
         this.shadowRoot.getElementById('btnReports').onclick = () => {
-            window.dispatchEvent(new CustomEvent('open-reports'));
+            window.dispatchEvent(new CustomEvent('open-reports', { bubbles: true, composed: true }));
         };
     }
 }
-customElements.define('app-nav', AppNav);
+
+if (!customElements.get('app-nav')) {
+    customElements.define('app-nav', AppNav);
+}

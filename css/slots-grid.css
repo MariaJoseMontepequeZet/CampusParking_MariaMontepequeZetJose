@@ -1,39 +1,45 @@
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 15px;
 }
 
 .slot {
-    height: 100px;
+    height: 110px;
     border-radius: 18px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(157, 78, 221, 0.1);
-    background: rgba(255, 255, 255, 0.02);
-    transition: 0.3s;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.slot:hover {
+    background: rgba(157, 78, 221, 0.1);
+    transform: translateY(-3px);
 }
 
 .occupied {
-    background: rgba(157, 78, 221, 0.15);
+    background: rgba(157, 78, 221, 0.25);
     border-color: #9d4edd;
-    color: white;
 }
 
 .num {
-    font-size: 9px;
-    opacity: 0.6;
+    font-size: 0.7rem;
+    color: #b0a0ca;
+    margin-bottom: 5px;
 }
 
 .icon {
-    font-size: 22px;
-    margin: 4px 0;
+    font-size: 2rem;
 }
 
 .plate {
-    font-size: 10px;
-    font-weight: bold;
-    font-family: 'Outfit';
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #deff9a;
+    margin-top: 5px;
 }

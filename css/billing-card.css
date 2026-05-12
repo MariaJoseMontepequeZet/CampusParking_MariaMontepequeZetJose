@@ -1,43 +1,36 @@
 .billing-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    animation: fadeIn 0.3s ease;
+    gap: 12px;
 }
 
 .bill-header {
     text-align: center;
+    padding-bottom: 15px;
     border-bottom: 1px solid rgba(157, 78, 221, 0.3);
-    padding-bottom: 10px;
-    margin-bottom: 10px;
 }
 
 .bill-detail {
     display: flex;
     justify-content: space-between;
     font-size: 0.9rem;
-    padding: 4px 0;
+    color: #b0a0ca;
 }
 
 .bill-total {
     margin-top: 15px;
-    padding-top: 10px;
-    border-top: 2px dashed rgba(157, 78, 221, 0.4);
+    padding: 15px;
+    background: rgba(157, 78, 221, 0.2);
+    border-radius: 10px;
     display: flex;
     justify-content: space-between;
     font-weight: 800;
-    color: #9d4edd;
-    font-size: 1.1rem;
+    color: #deff9a;
+    font-size: 1.2rem;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.btn-finish {
+    background: #deff9a;
+    color: #0f051d;
+    margin-top: 10px;
 }
