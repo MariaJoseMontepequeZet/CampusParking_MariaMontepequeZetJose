@@ -1,0 +1,36 @@
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+label {
+    font-size: 10px;
+    color: #b0a0ca;
+    text-transform: uppercase;
+    font-family: 'Outfit';
+    font-weight: bold;
+}
+
+input,
+select {
+    padding: 14px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(157, 78, 221, 0.2);
+    color: white;
+    border-radius: 12px;
+    outline: none;
+    font-size: 14px;
+}
+
+button {
+    background: linear-gradient(135deg, #9d4edd, #5a189a);
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: 'Outfit';
+    margin-top: 10px;
+}

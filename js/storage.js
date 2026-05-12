@@ -1,38 +1,53 @@
 export const CampusStorage = {
     init() {
-        if (!localStorage.getItem('cp_users')) {
-            localStorage.setItem('cp_users', JSON.stringify([{
-                nombre: 'admin',
-                email: 'admin@campusparking.com',
-                pass: 'Admin123'
-            }]));
-        }
-        if (!localStorage.getItem('cp_types')) {
-            // Valores iniciales comunes en Guatemala con rigor de 2 decimales
-            localStorage.setItem('cp_types', JSON.stringify([
-                { codigo: 'T-001', nombre: 'Moto', tarifa: "5.00" },
-                { codigo: 'T-002', nombre: 'Automóvil', tarifa: "15.00" },
-                { codigo: 'T-003', nombre: 'Camioneta', tarifa: "20.00" }
-            ]));
-        }
+        const types = [
+            { nombre: 'Moto', tarifa: "5.00" },
+            { nombre: 'Automóvil', tarifa: "15.00" },
+            { nombre: 'Camioneta', tarifa: "20.00" },
+            { nombre: 'Bicicleta', tarifa: "2.00" },
+            { nombre: 'Scooter', tarifa: "3.50" }
+        ];
+        localStorage.setItem('cp_types', JSON.stringify(types));
         if (!localStorage.getItem('cp_services')) localStorage.setItem('cp_services', "[]");
     },
-
-    getTypes: () => JSON.parse(localStorage.getItem('cp_types')),
 
     getServices: () => JSON.parse(localStorage.getItem('cp_services')),
 
     saveService(entry) {
         const services = this.getServices();
-        // Validar unicidad de Placa y Slot en estado activo
-        const isOccupied = services.find(s =>
-            (s.placa === entry.placa || s.slot === entry.slot) && s.estado === 'activo'
-        );
-
-        if (isOccupied) return { success: false, msg: "La placa o el slot ya se encuentran ocupados." };
-
+        const exists = services.find(s => (s.placa === entry.placa || s.slot === entry.slot) && s.estado === 'activo');
+        if (exists) return { success: false, msg: "Slot o Placa ya ocupados." };
         services.push(entry);
         localStorage.setItem('cp_services', JSON.stringify(services));
         return { success: true };
+    },
+
+    updateService(oldSlot, newData) {
+        const services = this.getServices();
+        const index = services.findIndex(s => parseInt(s.slot) === parseInt(oldSlot) && s.estado === 'activo');
+        if (index !== -1) {
+            services[index] = { ...services[index], ...newData };
+            localStorage.setItem('cp_services', JSON.stringify(services));
+            return true;
+        }
+        return false;
+    },
+
+    deleteService(slotId) {
+        let services = this.getServices();
+        services = services.filter(s => !(parseInt(s.slot) === parseInt(slotId) && s.estado === 'activo'));
+        localStorage.setItem('cp_services', JSON.stringify(services));
+        return true;
+    },
+
+    finishService(slotId) {
+        const services = this.getServices();
+        const s = services.find(s => parseInt(s.slot) === parseInt(slotId) && s.estado === 'activo');
+        if (!s) return { success: false };
+        const diffMin = Math.max(1, Math.floor((new Date() - new Date(s.entrada)) / 60000));
+        const tarifa = parseFloat(JSON.parse(localStorage.getItem('cp_types')).find(t => t.nombre === s.tipo).tarifa);
+        s.costo = ((tarifa / 60) * diffMin).toFixed(2);
+        s.tiempo = diffMin;
+        return { success: true, data: s };
     }
 };
