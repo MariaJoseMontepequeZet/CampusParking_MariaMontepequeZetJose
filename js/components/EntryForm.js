@@ -34,13 +34,16 @@ export class EntryForm extends HTMLElement {
                 </div>`;
         }
 
+        // Definimos el valor inicial de la placa: Si es edición, el que trae, si es nuevo, solo "P"
+        const plateValue = isEdit ? this._selected.placa : 'P';
+
         this.shadowRoot.innerHTML = `
             <link rel="stylesheet" href="css/entry-form.css">
             <div class="form-container">
                 <h3>${isEdit ? t.edit_title : t.form_title}</h3>
                 
                 <label>${t.form_plate}</label>
-                <input type="text" id="placa" placeholder="P-000XXX" value="${isEdit ? this._selected.placa : ''}">
+                <input type="text" id="placa" maxlength="7" placeholder="P000XXX" value="${plateValue}">
                 
                 <label>${t.form_type}</label>
                 <select id="tipo">
@@ -70,44 +73,73 @@ export class EntryForm extends HTMLElement {
     }
 
     setupEvents(isEdit) {
-        this.shadowRoot.getElementById('mainBtn').onclick = () => {
-            const placa = this.shadowRoot.getElementById('placa').value.toUpperCase().trim();
-            const tipo = this.shadowRoot.getElementById('tipo').value;
+        const plateInput = this.shadowRoot.getElementById('placa');
 
-            if (isEdit) {
-                this.dispatchEvent(new CustomEvent('update-service', {
-                    detail: { ...this._selected, placa, tipo },
-                    bubbles: true, composed: true
-                }));
-            } else {
-                const slot = parseInt(this.shadowRoot.getElementById('slot').value);
-                if (!placa || !slot) return alert("Datos incompletos");
-
-                this.dispatchEvent(new CustomEvent('add-service', {
-                    detail: { placa, tipo, slot, id: Date.now(), estado: 'activo', entrada: new Date().toISOString() },
-                    bubbles: true, composed: true
-                }));
+        // Validación en tiempo real para que la 'P' sea fija
+        plateInput.oninput = () => {
+            let val = plateInput.value.toUpperCase();
+            if (!val.startsWith('P')) {
+                val = 'P' + val.replace(/^[^P]+/, ''); // Fuerza que empiece con P
             }
-            this.clear();
+            plateInput.value = val.substring(0, 7); // Mantiene el límite
         };
 
-        this.shadowRoot.getElementById('exitBtn').onclick = () => {
-            const rates = { "Automóvil": 15, "Moto": 5, "Camioneta": 20, "Bicicleta": 2, "Scooter": 3 };
-            const rate = rates[this._selected.tipo] || 10;
-            const hours = Math.max(1, Math.ceil((new Date() - new Date(this._selected.entrada)) / (1000 * 60 * 60)));
+        const mainBtn = this.shadowRoot.getElementById('mainBtn');
+        if (mainBtn) {
+            mainBtn.onclick = () => {
+                const placa = plateInput.value.toUpperCase().trim();
+                const tipo = this.shadowRoot.getElementById('tipo').value;
 
-            this.dispatchEvent(new CustomEvent('exit-service', {
-                detail: {
-                    ...this._selected,
-                    estado: 'finalizado',
-                    total: (hours * rate).toFixed(2),
-                    salida: new Date().toISOString(),
-                    slot: null // LIBERA EL CONTADOR Y EL GRID
-                },
-                bubbles: true, composed: true
-            }));
-            this.clear();
-        };
+                // Validación de longitud mínima (P + al menos 1 caracter)
+                if (placa.length < 2) return alert("Ingrese una placa válida");
+
+                if (isEdit) {
+                    this.dispatchEvent(new CustomEvent('update-service', {
+                        detail: { ...this._selected, placa, tipo },
+                        bubbles: true, composed: true
+                    }));
+                } else {
+                    const slotInput = this.shadowRoot.getElementById('slot');
+                    const slot = slotInput ? parseInt(slotInput.value) : null;
+                    if (!placa || !slot) return alert("Datos incompletos");
+
+                    this.dispatchEvent(new CustomEvent('add-service', {
+                        detail: { placa, tipo, slot, id: Date.now(), estado: 'activo', entrada: new Date().toISOString() },
+                        bubbles: true, composed: true
+                    }));
+                }
+                this.clear();
+            };
+        }
+
+        if (isEdit) {
+            const exitBtn = this.shadowRoot.getElementById('exitBtn');
+            const cancelBtn = this.shadowRoot.getElementById('cancelBtn');
+
+            if (exitBtn) {
+                exitBtn.onclick = () => {
+                    const rates = { "Automóvil": 15, "Moto": 5, "Camioneta": 20, "Bicicleta": 2, "Scooter": 3 };
+                    const rate = rates[this._selected.tipo] || 10;
+                    const hours = Math.max(1, Math.ceil((new Date() - new Date(this._selected.entrada)) / (1000 * 60 * 60)));
+
+                    this.dispatchEvent(new CustomEvent('exit-service', {
+                        detail: {
+                            ...this._selected,
+                            estado: 'finalizado',
+                            total: (hours * rate).toFixed(2),
+                            salida: new Date().toISOString(),
+                            slot: null
+                        },
+                        bubbles: true, composed: true
+                    }));
+                    this.clear();
+                };
+            }
+
+            if (cancelBtn) {
+                cancelBtn.onclick = () => this.clear();
+            }
+        }
     }
 
     clear() {
