@@ -54,13 +54,13 @@ export class AppNav extends HTMLElement {
                     </div>
                 </div>
 
-                <div class="stats-container">
+                <div class="stats-container counter-box">
                     <div class="stat-item">
-                        <span class="stat-value">${getCount('Vacíos')}</span>
-                        <span class="stat-label">Vacios</span>
+                        <span class="stat-value" style="color: #4ade80;">${20 - activos.length}</span>
+                        <span class="stat-label">Vacíos</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">${getCount('Ocupados')}</span>
+                        <span class="stat-value" style="color: #f87171;">${activos.length}</span>
                         <span class="stat-label">Ocupados</span>
                     </div>
                 </div>

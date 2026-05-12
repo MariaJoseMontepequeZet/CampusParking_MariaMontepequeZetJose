@@ -15,12 +15,42 @@ export class EntryForm extends HTMLElement {
 
     connectedCallback() { this.render(); }
 
+    // Mapeo de prefijo según tipo de vehículo
+    getPrefix(tipo) {
+        const prefixes = {
+            'Automóvil': 'P',
+            'Moto': 'M',
+            'Camioneta': 'C',
+            'Bicicleta': 'B',
+            'Scooter': 'S'
+        };
+        return prefixes[tipo] || 'P';
+    }
+
+    // Parsear placa existente para extraer números y letras
+    parsePlaca(placa) {
+        if (!placa) return { nums: '', letters: '' };
+        // Formato: X-123ABC o X123ABC
+        const clean = placa.replace(/^[PMCBS]-?/, '');
+        const nums = clean.replace(/[^0-9]/g, '').substring(0, 3);
+        const letters = clean.replace(/[^A-Z]/g, '').substring(0, 3);
+        return { nums, letters };
+    }
+
     render() {
         const t = translations[getLang()] || translations['es'];
         const isEdit = this._mode === 'edit';
         let billHTML = '';
+        const currentTipo = isEdit ? this._selected.tipo : 'Automóvil';
+        const prefix = this.getPrefix(currentTipo);
 
+        let parsedNums = '';
+        let parsedLetters = '';
         if (isEdit) {
+            const parsed = this.parsePlaca(this._selected.placa);
+            parsedNums = parsed.nums;
+            parsedLetters = parsed.letters;
+
             const entrada = new Date(this._selected.entrada);
             const ahora = new Date();
             const hours = Math.max(1, Math.ceil((ahora - entrada) / (1000 * 60 * 60)));
@@ -29,7 +59,7 @@ export class EntryForm extends HTMLElement {
             const total = (hours * rate).toFixed(2);
 
             billHTML = `
-                <div class="price-tag" style="color: #deff9a; background: rgba(222, 255, 154, 0.1); padding: 10px; border-radius: 8px; text-align: center; margin: 10px 0;">
+                <div class="price-tag">
                     Total a cobrar: Q${total} (${hours}h)
                 </div>`;
         }
@@ -39,17 +69,25 @@ export class EntryForm extends HTMLElement {
             <div class="form-container">
                 <h3>${isEdit ? t.edit_title : t.form_title}</h3>
                 
-                <label>${t.form_plate}</label>
-                <input type="text" id="placa" placeholder="P-000XXX" value="${isEdit ? this._selected.placa : ''}">
-                
                 <label>${t.form_type}</label>
                 <select id="tipo">
-                    <option value="Automóvil" ${isEdit && this._selected.tipo === 'Automóvil' ? 'selected' : ''}>Automóvil</option>
-                    <option value="Moto" ${isEdit && this._selected.tipo === 'Moto' ? 'selected' : ''}>Moto</option>
-                    <option value="Camioneta" ${isEdit && this._selected.tipo === 'Camioneta' ? 'selected' : ''}>Camioneta</option>
-                    <option value="Bicicleta" ${isEdit && this._selected.tipo === 'Bicicleta' ? 'selected' : ''}>Bicicleta</option>
-                    <option value="Scooter" ${isEdit && this._selected.tipo === 'Scooter' ? 'selected' : ''}>Scooter</option>
+                    <option value="Automóvil" ${currentTipo === 'Automóvil' ? 'selected' : ''}>Automóvil</option>
+                    <option value="Moto" ${currentTipo === 'Moto' ? 'selected' : ''}>Moto</option>
+                    <option value="Camioneta" ${currentTipo === 'Camioneta' ? 'selected' : ''}>Camioneta</option>
+                    <option value="Bicicleta" ${currentTipo === 'Bicicleta' ? 'selected' : ''}>Bicicleta</option>
+                    <option value="Scooter" ${currentTipo === 'Scooter' ? 'selected' : ''}>Scooter</option>
                 </select>
+
+                <label>${t.form_plate}</label>
+                <div class="placa-group">
+                    <span class="placa-prefix" id="prefixLabel">${prefix}</span>
+                    <span class="placa-sep">-</span>
+                    <input type="text" id="placaNums" placeholder="123" maxlength="3" 
+                           value="${parsedNums}" class="placa-input placa-nums"
+                           inputmode="numeric">
+                    <input type="text" id="placaLetters" placeholder="ABC" maxlength="3" 
+                           value="${parsedLetters}" class="placa-input placa-letters">
+                </div>
 
                 ${!isEdit ? `<label>${t.form_slot}</label><input type="number" id="slot" min="1" max="20">` : ''}
                 
@@ -70,9 +108,43 @@ export class EntryForm extends HTMLElement {
     }
 
     setupEvents(isEdit) {
+        const tipoSelect = this.shadowRoot.getElementById('tipo');
+        const prefixLabel = this.shadowRoot.getElementById('prefixLabel');
+        const numsInput = this.shadowRoot.getElementById('placaNums');
+        const lettersInput = this.shadowRoot.getElementById('placaLetters');
+
+        // Cambiar prefijo cuando cambia el tipo de vehículo
+        tipoSelect.onchange = () => {
+            prefixLabel.textContent = this.getPrefix(tipoSelect.value);
+        };
+
+        // Validar: solo números en el campo de números (máx 3)
+        numsInput.oninput = () => {
+            numsInput.value = numsInput.value.replace(/[^0-9]/g, '').substring(0, 3);
+            if (numsInput.value.length === 3) lettersInput.focus();
+        };
+
+        // Validar: solo letras mayúsculas en el campo de letras (máx 3)
+        lettersInput.oninput = () => {
+            lettersInput.value = lettersInput.value.replace(/[^A-Za-z]/g, '').toUpperCase().substring(0, 3);
+        };
+
+        // Botón principal (registrar / actualizar)
         this.shadowRoot.getElementById('mainBtn').onclick = () => {
-            const placa = this.shadowRoot.getElementById('placa').value.toUpperCase().trim();
-            const tipo = this.shadowRoot.getElementById('tipo').value;
+            const tipo = tipoSelect.value;
+            const nums = numsInput.value;
+            const letters = lettersInput.value.toUpperCase();
+
+            // Validar formato: exactamente 3 números y 3 letras
+            if (nums.length !== 3 || !/^\d{3}$/.test(nums)) {
+                return alert("Ingresa exactamente 3 números en la placa");
+            }
+            if (letters.length !== 3 || !/^[A-Z]{3}$/.test(letters)) {
+                return alert("Ingresa exactamente 3 letras en la placa");
+            }
+
+            const prefix = this.getPrefix(tipo);
+            const placa = `${prefix}-${nums}${letters}`;
 
             if (isEdit) {
                 window.dispatchEvent(new CustomEvent('update-service', {
@@ -80,7 +152,7 @@ export class EntryForm extends HTMLElement {
                 }));
             } else {
                 const slot = parseInt(this.shadowRoot.getElementById('slot').value);
-                if (!placa || !slot) return alert("Datos incompletos");
+                if (!slot) return alert("Selecciona un espacio (slot)");
 
                 window.dispatchEvent(new CustomEvent('add-service', {
                     detail: { placa, tipo, slot, id: Date.now(), estado: 'activo', entrada: new Date().toISOString() }
@@ -89,6 +161,11 @@ export class EntryForm extends HTMLElement {
             this.clear();
         };
 
+        // Botón cancelar en modo edición
+        const cancelBtn = this.shadowRoot.getElementById('cancelBtn');
+        if (cancelBtn) cancelBtn.onclick = () => this.clear();
+
+        // Botón dar salida
         const exitBtn = this.shadowRoot.getElementById('exitBtn');
         if (exitBtn) exitBtn.onclick = () => {
             const rates = { "Automóvil": 15, "Moto": 5, "Camioneta": 20, "Bicicleta": 2, "Scooter": 3 };
