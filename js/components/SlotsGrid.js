@@ -1,25 +1,60 @@
 export class SlotsGrid extends HTMLElement {
-    constructor() { super(); this.attachShadow({ mode: 'open' }); }
-    connectedCallback() { this.render(); window.addEventListener('storage-update', () => this.render()); }
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+    }
+
+    connectedCallback() {
+        this.render();
+        // Escucha cambios para refrescarse solo
+        window.addEventListener('storage-update', () => this.render());
+    }
+
     render() {
         const services = JSON.parse(localStorage.getItem('cp_services') || '[]');
         const activos = services.filter(s => s.estado === 'activo');
+
+        // Mapeo de íconos por tipo
+        const icons = {
+            "Automóvil": "🚗",
+            "Moto": "🏍️",
+            "Camioneta": "🚙",
+            "Bicicleta": "🚲",
+            "Scooter": "🛴"
+        };
+
         let html = '';
-        for (let i = 1; i <= 30; i++) {
-            const s = activos.find(item => item.slot === i);
-            html += `<div class="slot ${s ? 'occupied' : 'free'}" data-slot="${i}">
-                <span class="num">${i}</span>
-                <div class="icon">${s ? '🚗' : '◌'}</div>
-                <span class="plate">${s ? s.placa : 'LIBRE'}</span>
-            </div>`;
+        // Iteramos hasta 20 (o 30 según tu diseño)
+        for (let i = 1; i <= 20; i++) {
+            const s = activos.find(item => parseInt(item.slot) === i);
+            const icon = s ? (icons[s.tipo] || '🚗') : '◌';
+
+            html += `
+                <div class="slot ${s ? 'occupied' : 'free'}" data-slot="${i}">
+                    <span class="num">${i}</span>
+                    <div class="icon">${icon}</div>
+                    <span class="plate">${s ? s.placa : 'LIBRE'}</span>
+                </div>`;
         }
-        this.shadowRoot.innerHTML = `<link rel="stylesheet" href="css/slots-grid.css"><div class="grid">${html}</div>`;
+
+        this.shadowRoot.innerHTML = `
+            <link rel="stylesheet" href="css/slots-grid.css">
+            <div class="grid">
+                ${html}
+            </div>`;
+
+        // Evento para editar/dar salida
         this.shadowRoot.querySelectorAll('.occupied').forEach(el => {
             el.onclick = () => {
-                const s = activos.find(item => item.slot === parseInt(el.dataset.slot));
-                document.querySelector('entry-form').editMode = s;
+                const slotNum = parseInt(el.dataset.slot);
+                const s = activos.find(item => parseInt(item.slot) === slotNum);
+                const form = document.querySelector('entry-form');
+                if (form) form.editMode = s;
             };
         });
     }
 }
-customElements.define('slots-grid', SlotsGrid);
+
+if (!customElements.get('slots-grid')) {
+    customElements.define('slots-grid', SlotsGrid);
+}

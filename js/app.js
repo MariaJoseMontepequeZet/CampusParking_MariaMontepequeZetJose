@@ -8,8 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     CampusStorage.init();
     const mainContent = document.getElementById('main-content');
 
-    // Función para refrescar los contadores en el Nav
-    const refreshNav = () => {
+    const refreshSystem = () => {
         window.dispatchEvent(new CustomEvent('storage-update'));
     };
 
@@ -21,13 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const section = document.createElement('section');
         section.className = 'glass-panel';
         section.innerHTML = '<h2>Estado del Parqueo</h2>';
-        const slotsGrid = document.createElement('slots-grid');
-        section.appendChild(slotsGrid);
+        section.appendChild(document.createElement('slots-grid'));
 
         const aside = document.createElement('aside');
         aside.className = 'glass-panel';
-        const entryForm = document.createElement('entry-form');
-        aside.appendChild(entryForm);
+        aside.appendChild(document.createElement('entry-form'));
 
         mainContent.appendChild(section);
         mainContent.appendChild(aside);
@@ -37,21 +34,19 @@ document.addEventListener('DOMContentLoaded', () => {
         mainContent.innerHTML = '';
         mainContent.className = 'reports-view';
         mainContent.style.display = 'block';
-
-        const reports = document.createElement('income-reports');
-        mainContent.appendChild(reports);
+        mainContent.appendChild(document.createElement('income-reports'));
     };
 
     // Navegación
     window.addEventListener('show-dashboard', renderDashboard);
     window.addEventListener('open-reports', renderReports);
 
-    // Gestión de Datos
+    // Acciones de Datos
     window.addEventListener('add-service', (e) => {
         const services = JSON.parse(localStorage.getItem('cp_services') || '[]');
         services.push(e.detail);
         localStorage.setItem('cp_services', JSON.stringify(services));
-        refreshNav();
+        refreshSystem();
         renderDashboard();
     });
 
@@ -61,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (index !== -1) {
             services[index] = e.detail;
             localStorage.setItem('cp_services', JSON.stringify(services));
-            refreshNav();
+            refreshSystem();
             renderDashboard();
         }
     });

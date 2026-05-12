@@ -61,9 +61,7 @@ export class AppNav extends HTMLElement {
                     </div>
                     
                     <div class="user-profile">
-                        <div class="user-info">
-                            <strong>Administrador</strong>
-                        </div>
+                        <button id="btnProfile" class="btn-nav"><strong>Administrador</strong></button>
                         <div class="avatar">👤</div>
                     </div>
                 </div>
@@ -80,6 +78,10 @@ export class AppNav extends HTMLElement {
 
         this.shadowRoot.getElementById('btnReports').onclick = () => {
             window.dispatchEvent(new CustomEvent('open-reports', { bubbles: true, composed: true }));
+        };
+
+        this.shadowRoot.getElementById('btnProfile').onclick = () => {
+            window.dispatchEvent(new CustomEvent('open-profile', { bubbles: true, composed: true }));
         };
     }
 }

@@ -91,26 +91,23 @@ export class EntryForm extends HTMLElement {
             this.clear();
         };
 
-        if (isEdit) {
-            this.shadowRoot.getElementById('cancelBtn').onclick = () => this.clear();
-            this.shadowRoot.getElementById('exitBtn').onclick = () => {
-                const rates = { "Automóvil": 15, "Moto": 5, "Camioneta": 20, "Bicicleta": 2, "Scooter": 3 };
-                const rate = rates[this._selected.tipo] || 10;
-                const hours = Math.max(1, Math.ceil((new Date() - new Date(this._selected.entrada)) / (1000 * 60 * 60)));
+        this.shadowRoot.getElementById('exitBtn').onclick = () => {
+            const rates = { "Automóvil": 15, "Moto": 5, "Camioneta": 20, "Bicicleta": 2, "Scooter": 3 };
+            const rate = rates[this._selected.tipo] || 10;
+            const hours = Math.max(1, Math.ceil((new Date() - new Date(this._selected.entrada)) / (1000 * 60 * 60)));
 
-                this.dispatchEvent(new CustomEvent('exit-service', {
-                    detail: {
-                        ...this._selected,
-                        estado: 'finalizado',
-                        costo: (hours * rate).toFixed(2),
-                        salida: new Date().toISOString(),
-                        slot: null // LIBERA EL ESPACIO PARA EL CONTADOR
-                    },
-                    bubbles: true, composed: true
-                }));
-                this.clear();
-            };
-        }
+            this.dispatchEvent(new CustomEvent('exit-service', {
+                detail: {
+                    ...this._selected,
+                    estado: 'finalizado',
+                    total: (hours * rate).toFixed(2),
+                    salida: new Date().toISOString(),
+                    slot: null // LIBERA EL CONTADOR Y EL GRID
+                },
+                bubbles: true, composed: true
+            }));
+            this.clear();
+        };
     }
 
     clear() {
