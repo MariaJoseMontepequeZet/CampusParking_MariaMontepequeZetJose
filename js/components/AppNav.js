@@ -54,6 +54,17 @@ export class AppNav extends HTMLElement {
                     </div>
                 </div>
 
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <span class="stat-value">${getCount('Vacíos')}</span>
+                        <span class="stat-label">Vacios</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">${getCount('Ocupados')}</span>
+                        <span class="stat-label">Ocupados</span>
+                    </div>
+                </div>
+
                 <div class="nav-right">
                     <div class="nav-actions">
                         <button id="btnHome" class="btn-nav">🏠 INICIO</button>
