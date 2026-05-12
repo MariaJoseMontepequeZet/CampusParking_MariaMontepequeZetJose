@@ -63,7 +63,6 @@ export class AppNav extends HTMLElement {
                     <div class="user-profile">
                         <div class="user-info">
                             <strong>Administrador</strong>
-                            <span>Sistema USAC</span>
                         </div>
                         <div class="avatar">👤</div>
                     </div>
