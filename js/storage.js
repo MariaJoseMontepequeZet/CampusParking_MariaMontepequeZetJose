@@ -11,7 +11,7 @@ export const CampusStorage = {
         if (!localStorage.getItem('cp_services')) localStorage.setItem('cp_services', "[]");
     },
 
-    getServices: () => JSON.parse(localStorage.getItem('cp_services')),
+    getServices: () => JSON.parse(localStorage.getItem('cp_services')) || [],
 
     saveService(entry) {
         const services = this.getServices();
