@@ -43,3 +43,48 @@
     color: #deff9a;
     margin-top: 5px;
 }
+
+/* ===== RESPONSIVE MOBILE ===== */
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+        gap: 10px;
+    }
+
+    .slot {
+        height: 90px;
+        border-radius: 14px;
+    }
+
+    .icon {
+        font-size: 1.5rem;
+    }
+
+    .plate {
+        font-size: 0.6rem;
+    }
+
+    .num {
+        font-size: 0.6rem;
+    }
+}
+
+@media (max-width: 420px) {
+    .grid {
+        grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+        gap: 8px;
+    }
+
+    .slot {
+        height: 80px;
+        border-radius: 12px;
+    }
+
+    .icon {
+        font-size: 1.3rem;
+    }
+
+    .plate {
+        font-size: 0.55rem;
+    }
+}

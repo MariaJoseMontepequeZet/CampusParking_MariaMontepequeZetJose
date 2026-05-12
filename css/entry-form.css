@@ -25,6 +25,9 @@ select {
     border-radius: 12px;
     color: white;
     outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 16px; /* Prevents iOS zoom on focus */
 }
 
 button {
@@ -36,6 +39,8 @@ button {
     font-weight: bold;
     cursor: pointer;
     transition: 0.3s;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 button:hover {
@@ -51,4 +56,27 @@ button:hover {
     text-align: center;
     font-weight: 800;
     border: 1px dashed #deff9a;
+}
+
+/* ===== RESPONSIVE MOBILE ===== */
+@media (max-width: 768px) {
+    .form-container {
+        gap: 10px;
+    }
+
+    h3 {
+        font-size: 1rem;
+    }
+
+    input,
+    select {
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    button {
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 0.85rem;
+    }
 }

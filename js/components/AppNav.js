@@ -71,10 +71,10 @@ export class AppNav extends HTMLElement {
                         <button id="btnReports" class="btn-nav">📊 GANANCIAS</button>
                     </div>
                     
-                    <div class="user-profile">
-                        <button id="btnProfile" class="btn-nav"><strong>Administrador</strong></button>
+                    <button id="btnProfile" class="user-profile-btn">
+                        <span class="user-name">Administrador</span>
                         <div class="avatar">👤</div>
-                    </div>
+                    </button>
                 </div>
             </nav>
         `;
