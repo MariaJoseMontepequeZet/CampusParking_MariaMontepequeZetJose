@@ -18,7 +18,7 @@ export const CampusStorage = {
         // Usuario administrador por defecto
         if (!localStorage.getItem('cp_user')) {
             const user = {
-                nombre: 'admin',
+                nombre: 'Administrador',
                 email: 'admin@campusparking.com',
                 password: 'Admin123'
             };

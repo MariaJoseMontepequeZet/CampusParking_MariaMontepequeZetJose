@@ -7,7 +7,7 @@ export const setLang = (lang) => {
 
 export const translations = {
     es: {
-        app_title: "Campus Parking | Admin",
+        app_title: "Campus Parking",
         login_subtitle: "Sistema de Administración",
         login_email: "Correo Electrónico",
         login_password: "Contraseña",
@@ -110,7 +110,7 @@ export const translations = {
         profile_default_name: "Administrador"
     },
     en: {
-        app_title: "Campus Parking | Admin",
+        app_title: "Campus Parking",
         login_subtitle: "Administration System",
         login_email: "Email",
         login_password: "Password",
