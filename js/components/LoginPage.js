@@ -9,7 +9,6 @@ export class LoginPage extends HTMLElement {
     }
 
     render() {
-        // Cargar credenciales guardadas
         const savedEmail = localStorage.getItem('cp_saved_email') || '';
         const savedPass = localStorage.getItem('cp_saved_pass') || '';
         const rememberChecked = savedEmail ? 'checked' : '';
@@ -28,7 +27,7 @@ export class LoginPage extends HTMLElement {
 
                     <form id="loginForm">
                         <label>Correo Electrónico</label>
-                        <input type="email" id="email" placeholder="admin@ejemplo.com" 
+                        <input type="email" id="email" placeholder="admin@campusparking.com" 
                                value="${savedEmail}" autocomplete="email" required>
 
                         <label>Contraseña</label>
@@ -60,9 +59,7 @@ export class LoginPage extends HTMLElement {
         const passInput = this.shadowRoot.getElementById('password');
         const rememberCheck = this.shadowRoot.getElementById('remember');
         const toggleBtn = this.shadowRoot.getElementById('togglePass');
-        const errorMsg = this.shadowRoot.getElementById('errorMsg');
 
-        // Toggle ver/ocultar contraseña
         toggleBtn.onclick = () => {
             if (passInput.type === 'password') {
                 passInput.type = 'text';
@@ -73,26 +70,19 @@ export class LoginPage extends HTMLElement {
             }
         };
 
-        // Submit del formulario
         form.onsubmit = (e) => {
             e.preventDefault();
 
             const email = emailInput.value.trim();
             const password = passInput.value;
 
-            // Validar campos vacíos
-            if (!email) {
-                this.showError('⚠️ Ingresa tu correo electrónico.');
-                return;
-            }
-            if (!password) {
-                this.showError('⚠️ Ingresa tu contraseña.');
-                return;
-            }
+            if (!email) return this.showError('⚠️ Ingresa tu correo electrónico.');
+            if (!password) return this.showError('⚠️ Ingresa tu contraseña.');
 
-            // Verificar credenciales
-            if (email === 'Admin1@gmail.com' && password === '123admin') {
-                // Guardar credenciales si el checkbox está marcado
+            // Leer credenciales desde localStorage (dinámicas)
+            const user = JSON.parse(localStorage.getItem('cp_user') || '{}');
+
+            if (email === user.email && password === user.password) {
                 if (rememberCheck.checked) {
                     localStorage.setItem('cp_saved_email', email);
                     localStorage.setItem('cp_saved_pass', password);
@@ -101,10 +91,7 @@ export class LoginPage extends HTMLElement {
                     localStorage.removeItem('cp_saved_pass');
                 }
 
-                // Marcar como logueado
                 sessionStorage.setItem('cp_logged_in', 'true');
-
-                // Notificar al sistema
                 window.dispatchEvent(new CustomEvent('login-success'));
             } else {
                 this.showError('❌ Credenciales incorrectas. Verifica tu correo y contraseña.');
@@ -119,7 +106,7 @@ export class LoginPage extends HTMLElement {
         errorMsg.textContent = msg;
         errorMsg.style.display = 'block';
         errorMsg.style.animation = 'none';
-        errorMsg.offsetHeight; // trigger reflow
+        errorMsg.offsetHeight;
         errorMsg.style.animation = 'shakeLogin 0.4s ease';
         setTimeout(() => { errorMsg.style.display = 'none'; }, 5000);
     }

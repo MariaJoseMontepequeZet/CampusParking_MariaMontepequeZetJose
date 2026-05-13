@@ -13,6 +13,7 @@ export class AppNav extends HTMLElement {
 
     render() {
         const services = JSON.parse(localStorage.getItem('cp_services')) || [];
+        const user = JSON.parse(localStorage.getItem('cp_user') || '{}');
 
         // FILTRO DE SEGURIDAD: 
         // 1. Que el estado sea 'activo'.
@@ -72,7 +73,7 @@ export class AppNav extends HTMLElement {
                     </div>
                     
                     <button id="btnProfile" class="user-profile-btn">
-                        <span class="user-name">Administrador</span>
+                        <span class="user-name">${user.nombre || 'Administrador'}</span>
                         <div class="avatar">👤</div>
                     </button>
                 </div>
