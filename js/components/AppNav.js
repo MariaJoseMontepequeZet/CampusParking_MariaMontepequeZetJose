@@ -1,3 +1,5 @@
+import { translations, getLang } from '../i18n.js';
+
 export class AppNav extends HTMLElement {
     constructor() {
         super();
@@ -12,6 +14,7 @@ export class AppNav extends HTMLElement {
     }
 
     render() {
+        const t = translations[getLang()] || translations['es'];
         const services = JSON.parse(localStorage.getItem('cp_services')) || [];
         const user = JSON.parse(localStorage.getItem('cp_user') || '{}');
 
@@ -35,45 +38,45 @@ export class AppNav extends HTMLElement {
                 <div class="stats-container">
                     <div class="stat-item">
                         <span class="stat-value">${getCount('Automóvil')}</span>
-                        <span class="stat-label">Autos</span>
+                        <span class="stat-label">${t.nav_cars}</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-value">${getCount('Camioneta')}</span>
-                        <span class="stat-label">Camionetas</span>
+                        <span class="stat-label">${t.nav_trucks}</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-value">${getCount('Moto')}</span>
-                        <span class="stat-label">Motos</span>
+                        <span class="stat-label">${t.nav_motos}</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-value">${getCount('Bicicleta')}</span>
-                        <span class="stat-label">Bicis</span>
+                        <span class="stat-label">${t.nav_bikes}</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-value">${getCount('Scooter')}</span>
-                        <span class="stat-label">Scoots</span>
+                        <span class="stat-label">${t.nav_scooters}</span>
                     </div>
                 </div>
 
                 <div class="stats-container counter-box">
                     <div class="stat-item">
-                        <span class="stat-value" style="color: #4ade80;">${20 - activos.length}</span>
-                        <span class="stat-label">Vacíos</span>
+                        <span class="stat-value" style="color: #4ade80;">${50 - activos.length}</span>
+                        <span class="stat-label">${t.nav_empty}</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-value" style="color: #f87171;">${activos.length}</span>
-                        <span class="stat-label">Ocupados</span>
+                        <span class="stat-label">${t.nav_occupied}</span>
                     </div>
                 </div>
 
                 <div class="nav-right">
                     <div class="nav-actions">
-                        <button id="btnHome" class="btn-nav">🏠 INICIO</button>
-                        <button id="btnReports" class="btn-nav">📊 GANANCIAS</button>
+                        <button id="btnHome" class="btn-nav">${t.nav_home}</button>
+                        <button id="btnReports" class="btn-nav">${t.nav_reports}</button>
                     </div>
                     
                     <button id="btnProfile" class="user-profile-btn">
-                        <span class="user-name">${user.nombre || 'Administrador'}</span>
+                        <span class="user-name">${user.nombre || t.profile_default_name}</span>
                         <div class="avatar">👤</div>
                     </button>
                 </div>

@@ -1,3 +1,5 @@
+import { translations, getLang } from '../i18n.js';
+
 export class SlotsGrid extends HTMLElement {
     constructor() {
         super();
@@ -11,6 +13,7 @@ export class SlotsGrid extends HTMLElement {
     }
 
     render() {
+        const t = translations[getLang()] || translations['es'];
         const services = JSON.parse(localStorage.getItem('cp_services') || '[]');
         const activos = services.filter(s => s.estado === 'activo');
 
@@ -24,8 +27,8 @@ export class SlotsGrid extends HTMLElement {
         };
 
         let html = '';
-        // Iteramos hasta 20 (o 30 según tu diseño)
-        for (let i = 1; i <= 20; i++) {
+        // Iteramos hasta 50 (o más, según tu diseño)
+        for (let i = 1; i <= 50; i++) {
             const s = activos.find(item => parseInt(item.slot) === i);
             const icon = s ? (icons[s.tipo] || '🚗') : '◌';
 
@@ -33,7 +36,7 @@ export class SlotsGrid extends HTMLElement {
                 <div class="slot ${s ? 'occupied' : 'free'}" data-slot="${i}">
                     <span class="num">${i}</span>
                     <div class="icon">${icon}</div>
-                    <span class="plate">${s ? s.placa : 'LIBRE'}</span>
+                    <span class="plate">${s ? s.placa : t.slot_free}</span>
                 </div>`;
         }
 

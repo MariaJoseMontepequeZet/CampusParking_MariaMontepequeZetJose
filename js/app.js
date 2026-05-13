@@ -1,4 +1,5 @@
 import { CampusStorage } from './storage.js';
+import { translations, getLang } from './i18n.js';
 import './components/AppNav.js';
 import './components/EntryForm.js';
 import './components/SlotsGrid.js';
@@ -8,6 +9,10 @@ import './components/LoginPage.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     CampusStorage.init();
+
+    const t = translations[getLang()] || translations['es'];
+    document.documentElement.lang = getLang();
+    document.title = t.app_title;
 
     const appContainer = document.querySelector('.app-container');
     const mainContent = document.getElementById('main-content');
@@ -41,13 +46,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===== VISTAS =====
     const renderDashboard = () => {
+        const t = translations[getLang()] || translations['es'];
         mainContent.innerHTML = '';
         mainContent.className = 'main-layout';
         mainContent.style.display = 'grid';
 
         const section = document.createElement('section');
         section.className = 'glass-panel';
-        section.innerHTML = '<h2>Estado del Parqueo</h2>';
+        section.innerHTML = `<h2>${t.dashboard_title}</h2>`;
         section.appendChild(document.createElement('slots-grid'));
 
         const aside = document.createElement('aside');

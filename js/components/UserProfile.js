@@ -31,7 +31,7 @@ export class UserProfile extends HTMLElement {
                     <!-- Header del perfil -->
                     <div class="profile-header">
                         <div class="profile-avatar-big">👤</div>
-                        <h2 id="displayName">${user.nombre || 'Administrador'}</h2>
+                        <h2 id="displayName">${user.nombre || t.profile_default_name}</h2>
                         <p class="profile-email" id="displayEmail">${user.email || 'admin@campusparking.com'}</p>
                     </div>
 
@@ -39,30 +39,30 @@ export class UserProfile extends HTMLElement {
 
                     <!-- Formulario de edición -->
                     <div class="settings-section">
-                        <h3>Datos Personales</h3>
+                        <h3>${t.profile_personal_data}</h3>
                         
-                        <label>Nombre</label>
-                        <input type="text" id="inputName" value="${user.nombre || ''}" placeholder="Tu nombre">
+                        <label>${t.profile_name}</label>
+                        <input type="text" id="inputName" value="${user.nombre || ''}" placeholder="${t.profile_placeholder_name}">
                         
-                        <label>Correo Electrónico</label>
-                        <input type="email" id="inputEmail" value="${user.email || ''}" placeholder="correo@ejemplo.com">
+                        <label>${t.profile_email}</label>
+                        <input type="email" id="inputEmail" value="${user.email || ''}" placeholder="${t.profile_placeholder_email}">
                     </div>
 
                     <div class="settings-section">
-                        <h3>Cambiar Contraseña</h3>
+                        <h3>${t.profile_change_password}</h3>
                         
-                        <label>Contraseña Actual</label>
-                        <input type="password" id="inputCurrentPass" placeholder="••••••••">
+                        <label>${t.profile_current_password}</label>
+                        <input type="password" id="inputCurrentPass" placeholder="${t.profile_placeholder_current_password}">
                         
-                        <label>Nueva Contraseña</label>
-                        <input type="password" id="inputNewPass" placeholder="Nueva contraseña">
+                        <label>${t.profile_new_password}</label>
+                        <input type="password" id="inputNewPass" placeholder="${t.profile_placeholder_new_password}">
                     </div>
 
                     <div class="settings-section">
                         <h3>${t.profile_lang}</h3>
                         <select id="langSelect">
-                            <option value="es" ${getLang() === 'es' ? 'selected' : ''}>Español</option>
-                            <option value="en" ${getLang() === 'en' ? 'selected' : ''}>English</option>
+                            <option value="es" ${getLang() === 'es' ? 'selected' : ''}>${t.profile_language_option_es}</option>
+                            <option value="en" ${getLang() === 'en' ? 'selected' : ''}>${t.profile_language_option_en}</option>
                         </select>
                     </div>
 
@@ -76,6 +76,7 @@ export class UserProfile extends HTMLElement {
     }
 
     setupEvents() {
+        const t = translations[getLang()] || translations['es'];
         const user = JSON.parse(localStorage.getItem('cp_user') || '{}');
 
         // Cerrar modal
@@ -99,10 +100,10 @@ export class UserProfile extends HTMLElement {
             const newLang = this.shadowRoot.getElementById('langSelect').value;
 
             // Validaciones
-            if (!newName) return this.showMsg('profileMsg', '⚠️ El nombre no puede estar vacío.', true);
-            if (!newEmail) return this.showMsg('profileMsg', '⚠️ El correo no puede estar vacío.', true);
+            if (!newName) return this.showMsg('profileMsg', t.profile_invalid_name, true);
+            if (!newEmail) return this.showMsg('profileMsg', t.profile_invalid_email, true);
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
-                return this.showMsg('profileMsg', '⚠️ Ingresa un correo electrónico válido.', true);
+                return this.showMsg('profileMsg', t.profile_invalid_email_format, true);
             }
 
             // Actualizar datos del usuario
@@ -112,10 +113,10 @@ export class UserProfile extends HTMLElement {
 
             // Cambiar contraseña solo si se llenaron ambos campos
             if (currentPass || newPass) {
-                if (!currentPass) return this.showMsg('profileMsg', '⚠️ Ingresa tu contraseña actual.', true);
-                if (currentPass !== user.password) return this.showMsg('profileMsg', '❌ La contraseña actual es incorrecta.', true);
-                if (!newPass) return this.showMsg('profileMsg', '⚠️ Ingresa la nueva contraseña.', true);
-                if (newPass.length < 4) return this.showMsg('profileMsg', '⚠️ La nueva contraseña debe tener al menos 4 caracteres.', true);
+                if (!currentPass) return this.showMsg('profileMsg', t.profile_enter_current_password, true);
+                if (currentPass !== user.password) return this.showMsg('profileMsg', t.profile_invalid_current_password, true);
+                if (!newPass) return this.showMsg('profileMsg', t.profile_enter_new_password, true);
+                if (newPass.length < 4) return this.showMsg('profileMsg', t.profile_invalid_new_password, true);
                 updatedUser.password = newPass;
             }
 
@@ -136,7 +137,7 @@ export class UserProfile extends HTMLElement {
             this.shadowRoot.getElementById('inputCurrentPass').value = '';
             this.shadowRoot.getElementById('inputNewPass').value = '';
 
-            this.showMsg('profileMsg', '✅ Cambios guardados correctamente.');
+            this.showMsg('profileMsg', t.profile_saved_success);
 
             // Cambiar idioma si cambió
             if (newLang !== getLang()) {

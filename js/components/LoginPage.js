@@ -1,3 +1,5 @@
+import { translations, getLang } from '../i18n.js';
+
 export class LoginPage extends HTMLElement {
     constructor() {
         super();
@@ -9,6 +11,7 @@ export class LoginPage extends HTMLElement {
     }
 
     render() {
+        const t = translations[getLang()] || translations['es'];
         const savedEmail = localStorage.getItem('cp_saved_email') || '';
         const savedPass = localStorage.getItem('cp_saved_pass') || '';
         const rememberChecked = savedEmail ? 'checked' : '';
@@ -20,19 +23,19 @@ export class LoginPage extends HTMLElement {
                     <div class="login-header">
                         <div class="login-logo">🅿️</div>
                         <h1>CAMPUS<span>PARKING</span></h1>
-                        <p class="login-subtitle">Sistema de Administración</p>
+                        <p class="login-subtitle">${t.login_subtitle}</p>
                     </div>
 
                     <div id="errorMsg" class="login-error" style="display:none;"></div>
 
                     <form id="loginForm">
-                        <label>Correo Electrónico</label>
-                        <input type="email" id="email" placeholder="admin@campusparking.com" 
+                        <label>${t.login_email}</label>
+                        <input type="email" id="email" placeholder="${t.login_placeholder_email}" 
                                value="${savedEmail}" autocomplete="email" required>
 
-                        <label>Contraseña</label>
+                        <label>${t.login_password}</label>
                         <div class="password-group">
-                            <input type="password" id="password" placeholder="••••••••" 
+                            <input type="password" id="password" placeholder="${t.login_placeholder_password}" 
                                    value="${savedPass}" autocomplete="current-password" required>
                             <button type="button" id="togglePass" class="toggle-pass">👁️</button>
                         </div>
@@ -40,20 +43,20 @@ export class LoginPage extends HTMLElement {
                         <div class="remember-row">
                             <label class="checkbox-label">
                                 <input type="checkbox" id="remember" ${rememberChecked}>
-                                <span>Recordar credenciales</span>
+                                <span>${t.login_remember}</span>
                             </label>
                         </div>
 
-                        <button type="submit" id="loginBtn" class="login-btn">INICIAR SESIÓN</button>
+                        <button type="submit" id="loginBtn" class="login-btn">${t.login_button}</button>
                     </form>
                 </div>
             </div>
         `;
 
-        this.setupEvents();
+        this.setupEvents(t);
     }
 
-    setupEvents() {
+    setupEvents(t) {
         const form = this.shadowRoot.getElementById('loginForm');
         const emailInput = this.shadowRoot.getElementById('email');
         const passInput = this.shadowRoot.getElementById('password');
@@ -76,10 +79,9 @@ export class LoginPage extends HTMLElement {
             const email = emailInput.value.trim();
             const password = passInput.value;
 
-            if (!email) return this.showError('⚠️ Ingresa tu correo electrónico.');
-            if (!password) return this.showError('⚠️ Ingresa tu contraseña.');
+            if (!email) return this.showError(t.login_error_no_email);
+            if (!password) return this.showError(t.login_error_no_password);
 
-            // Leer credenciales desde localStorage (dinámicas)
             const user = JSON.parse(localStorage.getItem('cp_user') || '{}');
 
             if (email === user.email && password === user.password) {
@@ -94,7 +96,7 @@ export class LoginPage extends HTMLElement {
                 sessionStorage.setItem('cp_logged_in', 'true');
                 window.dispatchEvent(new CustomEvent('login-success'));
             } else {
-                this.showError('❌ Credenciales incorrectas. Verifica tu correo y contraseña.');
+                this.showError(t.login_error_credentials);
                 passInput.value = '';
                 passInput.focus();
             }

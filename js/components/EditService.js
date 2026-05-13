@@ -29,7 +29,7 @@ export class EditService extends HTMLElement {
             <link rel="stylesheet" href="css/edit-service.css">
             <div class="modal-overlay">
                 <div class="modal-content glass-panel">
-                    <h3>Gestión Slot ${this._data.slot}</h3>
+                    <h3>${t.edit_slot_management} ${this._data.slot}</h3>
                     
                     <div class="info-grid">
                         <div class="field">
@@ -39,16 +39,16 @@ export class EditService extends HTMLElement {
                         <div class="field">
                             <label>${t.form_type}</label>
                             <select id="editType">
-                                <option value="Automóvil" ${this._data.tipo === 'Automóvil' ? 'selected' : ''}>Automóvil</option>
-                                <option value="Moto" ${this._data.tipo === 'Moto' ? 'selected' : ''}>Moto</option>
-                                <option value="Camioneta" ${this._data.tipo === 'Camioneta' ? 'selected' : ''}>Camioneta</option>
+                                <option value="Automóvil" ${this._data.tipo === 'Automóvil' ? 'selected' : ''}>${t.type_automovil}</option>
+                                <option value="Moto" ${this._data.tipo === 'Moto' ? 'selected' : ''}>${t.type_moto}</option>
+                                <option value="Camioneta" ${this._data.tipo === 'Camioneta' ? 'selected' : ''}>${t.type_camioneta}</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="payment-info">
-                        <p>Tiempo transcurrido: <strong>${hours} hr(s)</strong></p>
-                        <p>Total a cobrar: <span style="color:#deff9a; font-size: 1.4rem;">Q${total}</span></p>
+                        <p>${t.edit_time_elapsed} <strong>${t.edit_hours_format.replace('{hours}', hours)}</strong></p>
+                        <p>${t.edit_total_charge} <span style="color:#deff9a; font-size: 1.4rem;">Q${total}</span></p>
                     </div>
 
                     <div class="actions">

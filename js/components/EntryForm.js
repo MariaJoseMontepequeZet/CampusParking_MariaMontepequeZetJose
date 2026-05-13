@@ -69,7 +69,7 @@ export class EntryForm extends HTMLElement {
 
             billHTML = `
                 <div class="price-tag">
-                    Total a cobrar: Q${total} (${hours}h)
+                    ${t.edit_total_charge} Q${total} (${hours}h)
                 </div>`;
         }
 
@@ -83,11 +83,11 @@ export class EntryForm extends HTMLElement {
                 
                 <label>${t.form_type}</label>
                 <select id="tipo">
-                    <option value="Automóvil" ${currentTipo === 'Automóvil' ? 'selected' : ''}>Automóvil</option>
-                    <option value="Moto" ${currentTipo === 'Moto' ? 'selected' : ''}>Moto</option>
-                    <option value="Camioneta" ${currentTipo === 'Camioneta' ? 'selected' : ''}>Camioneta</option>
-                    <option value="Bicicleta" ${currentTipo === 'Bicicleta' ? 'selected' : ''}>Bicicleta</option>
-                    <option value="Scooter" ${currentTipo === 'Scooter' ? 'selected' : ''}>Scooter</option>
+                    <option value="Automóvil" ${currentTipo === 'Automóvil' ? 'selected' : ''}>${t.type_automovil}</option>
+                    <option value="Moto" ${currentTipo === 'Moto' ? 'selected' : ''}>${t.type_moto}</option>
+                    <option value="Camioneta" ${currentTipo === 'Camioneta' ? 'selected' : ''}>${t.type_camioneta}</option>
+                    <option value="Bicicleta" ${currentTipo === 'Bicicleta' ? 'selected' : ''}>${t.type_bicicleta}</option>
+                    <option value="Scooter" ${currentTipo === 'Scooter' ? 'selected' : ''}>${t.type_scooter}</option>
                 </select>
 
                 <label>${t.form_plate}</label>
@@ -100,7 +100,7 @@ export class EntryForm extends HTMLElement {
                     <input type="text" id="placaLetters" placeholder="ABC" maxlength="3" 
                            value="${parsedLetters}" class="placa-input placa-letters">
                 </div>
-                <span class="hint">Solo 3 números y 3 letras. Sin caracteres especiales.</span>
+                <span class="hint">${t.form_hint}</span>
 
                 ${!isEdit ? `<label>${t.form_slot}</label><input type="number" id="slot" min="1" max="20">` : ''}
                 
@@ -121,6 +121,7 @@ export class EntryForm extends HTMLElement {
     }
 
     setupEvents(isEdit) {
+        const t = translations[getLang()] || translations['es'];
         const tipoSelect = this.shadowRoot.getElementById('tipo');
         const prefixLabel = this.shadowRoot.getElementById('prefixLabel');
         const numsInput = this.shadowRoot.getElementById('placaNums');
@@ -145,11 +146,11 @@ export class EntryForm extends HTMLElement {
         // Bloquear pegar caracteres especiales
         numsInput.onpaste = (e) => {
             const text = (e.clipboardData || window.clipboardData).getData('text');
-            if (/[^0-9]/.test(text)) { e.preventDefault(); this.showError('⚠️ Solo se admiten números (0-9)'); }
+            if (/[^0-9]/.test(text)) { e.preventDefault(); this.showError(t.form_error_numbers); }
         };
         lettersInput.onpaste = (e) => {
             const text = (e.clipboardData || window.clipboardData).getData('text');
-            if (/[^A-Za-z]/.test(text)) { e.preventDefault(); this.showError('⚠️ Solo se admiten letras (A-Z)'); }
+            if (/[^A-Za-z]/.test(text)) { e.preventDefault(); this.showError(t.form_error_letters); }
         };
 
         // Botón principal (registrar / actualizar)
@@ -160,13 +161,13 @@ export class EntryForm extends HTMLElement {
 
             // Validaciones con mensajes de error inline
             if (nums.length === 0 && letters.length === 0) {
-                return this.showError('⚠️ Datos incompletos. Ingresa el número de placa.');
+                return this.showError(t.form_error_incomplete);
             }
             if (nums.length !== 3 || !/^\d{3}$/.test(nums)) {
-                return this.showError('⚠️ Ingresa exactamente 3 números. No se admiten letras ni caracteres especiales.');
+                return this.showError(t.form_error_numbers);
             }
             if (letters.length !== 3 || !/^[A-Z]{3}$/.test(letters)) {
-                return this.showError('⚠️ Ingresa exactamente 3 letras. No se admiten números ni caracteres especiales.');
+                return this.showError(t.form_error_letters);
             }
 
             const prefix = this.getPrefix(tipo);
@@ -180,7 +181,7 @@ export class EntryForm extends HTMLElement {
                 // Al actualizar, verificar que la nueva placa no esté en uso por OTRO vehículo
                 const placaDuplicada = activos.find(s => s.placa === placa && s.id !== this._selected.id);
                 if (placaDuplicada) {
-                    return this.showError(`⚠️ La placa ${placa} ya está registrada en el Slot ${placaDuplicada.slot}.`);
+                    return this.showError(t.form_error_slot_occupied.replace('{slot}', placaDuplicada.slot).replace('{placa}', placa));
                 }
 
                 window.dispatchEvent(new CustomEvent('update-service', {
@@ -190,19 +191,19 @@ export class EntryForm extends HTMLElement {
                 const slot = parseInt(this.shadowRoot.getElementById('slot').value);
 
                 if (!slot || slot < 1 || slot > 20) {
-                    return this.showError('⚠️ Selecciona un espacio válido (1-20).');
+                    return this.showError(t.form_error_slot_invalid);
                 }
 
                 // Verificar si el slot ya está ocupado
                 const slotOcupado = activos.find(s => parseInt(s.slot) === slot);
                 if (slotOcupado) {
-                    return this.showError(`⚠️ El Slot ${slot} ya está ocupado por ${slotOcupado.placa}. Elige otro espacio.`);
+                    return this.showError(t.form_error_slot_occupied.replace('{slot}', slot).replace('{placa}', slotOcupado.placa));
                 }
 
                 // Verificar si la placa ya existe activa
                 const placaExiste = activos.find(s => s.placa === placa);
                 if (placaExiste) {
-                    return this.showError(`⚠️ La placa ${placa} ya está registrada en el Slot ${placaExiste.slot}.`);
+                    return this.showError(t.form_error_slot_occupied.replace('{slot}', placaExiste.slot).replace('{placa}', placa));
                 }
 
                 window.dispatchEvent(new CustomEvent('add-service', {
