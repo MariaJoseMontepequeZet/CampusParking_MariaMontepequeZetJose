@@ -191,7 +191,7 @@ export class EntryForm extends HTMLElement {
                 const slot = parseInt(this.shadowRoot.getElementById('slot').value);
 
                 if (!slot || slot < 1 || slot > 20) {
-                    return this.showError(t.form_error_slot_invalid);
+                    return this.showError('⚠️ Selecciona un espacio válido (1-20).');
                 }
 
                 // Verificar si el slot ya está ocupado
