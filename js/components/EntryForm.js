@@ -30,11 +30,20 @@ export class EntryForm extends HTMLElement {
     // Parsear placa existente para extraer números y letras
     parsePlaca(placa) {
         if (!placa) return { nums: '', letters: '' };
-        // Formato: X-123ABC o X123ABC
         const clean = placa.replace(/^[PMCBS]-?/, '');
         const nums = clean.replace(/[^0-9]/g, '').substring(0, 3);
         const letters = clean.replace(/[^A-Z]/g, '').substring(0, 3);
         return { nums, letters };
+    }
+
+    // Mostrar mensaje de error inline
+    showError(msg) {
+        const errorBox = this.shadowRoot.getElementById('errorMsg');
+        if (errorBox) {
+            errorBox.textContent = msg;
+            errorBox.style.display = 'block';
+            setTimeout(() => { errorBox.style.display = 'none'; }, 4000);
+        }
     }
 
     render() {
@@ -68,6 +77,9 @@ export class EntryForm extends HTMLElement {
             <link rel="stylesheet" href="css/entry-form.css">
             <div class="form-container">
                 <h3>${isEdit ? t.edit_title : t.form_title}</h3>
+
+                <!-- Mensaje de error inline -->
+                <div id="errorMsg" class="error-msg" style="display:none;"></div>
                 
                 <label>${t.form_type}</label>
                 <select id="tipo">
@@ -88,6 +100,7 @@ export class EntryForm extends HTMLElement {
                     <input type="text" id="placaLetters" placeholder="ABC" maxlength="3" 
                            value="${parsedLetters}" class="placa-input placa-letters">
                 </div>
+                <span class="hint">Solo 3 números y 3 letras. Sin caracteres especiales.</span>
 
                 ${!isEdit ? `<label>${t.form_slot}</label><input type="number" id="slot" min="1" max="20">` : ''}
                 
@@ -118,15 +131,25 @@ export class EntryForm extends HTMLElement {
             prefixLabel.textContent = this.getPrefix(tipoSelect.value);
         };
 
-        // Validar: solo números en el campo de números (máx 3)
+        // Validar: solo números (sin caracteres especiales)
         numsInput.oninput = () => {
             numsInput.value = numsInput.value.replace(/[^0-9]/g, '').substring(0, 3);
             if (numsInput.value.length === 3) lettersInput.focus();
         };
 
-        // Validar: solo letras mayúsculas en el campo de letras (máx 3)
+        // Validar: solo letras (sin caracteres especiales)
         lettersInput.oninput = () => {
             lettersInput.value = lettersInput.value.replace(/[^A-Za-z]/g, '').toUpperCase().substring(0, 3);
+        };
+
+        // Bloquear pegar caracteres especiales
+        numsInput.onpaste = (e) => {
+            const text = (e.clipboardData || window.clipboardData).getData('text');
+            if (/[^0-9]/.test(text)) { e.preventDefault(); this.showError('⚠️ Solo se admiten números (0-9)'); }
+        };
+        lettersInput.onpaste = (e) => {
+            const text = (e.clipboardData || window.clipboardData).getData('text');
+            if (/[^A-Za-z]/.test(text)) { e.preventDefault(); this.showError('⚠️ Solo se admiten letras (A-Z)'); }
         };
 
         // Botón principal (registrar / actualizar)
@@ -135,24 +158,52 @@ export class EntryForm extends HTMLElement {
             const nums = numsInput.value;
             const letters = lettersInput.value.toUpperCase();
 
-            // Validar formato: exactamente 3 números y 3 letras
+            // Validaciones con mensajes de error inline
+            if (nums.length === 0 && letters.length === 0) {
+                return this.showError('⚠️ Datos incompletos. Ingresa el número de placa.');
+            }
             if (nums.length !== 3 || !/^\d{3}$/.test(nums)) {
-                return alert("Ingresa exactamente 3 números en la placa");
+                return this.showError('⚠️ Ingresa exactamente 3 números. No se admiten letras ni caracteres especiales.');
             }
             if (letters.length !== 3 || !/^[A-Z]{3}$/.test(letters)) {
-                return alert("Ingresa exactamente 3 letras en la placa");
+                return this.showError('⚠️ Ingresa exactamente 3 letras. No se admiten números ni caracteres especiales.');
             }
 
             const prefix = this.getPrefix(tipo);
             const placa = `${prefix}-${nums}${letters}`;
 
+            // Obtener servicios activos para validar duplicados
+            const services = JSON.parse(localStorage.getItem('cp_services') || '[]');
+            const activos = services.filter(s => s.estado === 'activo');
+
             if (isEdit) {
+                // Al actualizar, verificar que la nueva placa no esté en uso por OTRO vehículo
+                const placaDuplicada = activos.find(s => s.placa === placa && s.id !== this._selected.id);
+                if (placaDuplicada) {
+                    return this.showError(`⚠️ La placa ${placa} ya está registrada en el Slot ${placaDuplicada.slot}.`);
+                }
+
                 window.dispatchEvent(new CustomEvent('update-service', {
                     detail: { ...this._selected, placa, tipo }
                 }));
             } else {
                 const slot = parseInt(this.shadowRoot.getElementById('slot').value);
-                if (!slot) return alert("Selecciona un espacio (slot)");
+
+                if (!slot || slot < 1 || slot > 20) {
+                    return this.showError('⚠️ Selecciona un espacio válido (1-20).');
+                }
+
+                // Verificar si el slot ya está ocupado
+                const slotOcupado = activos.find(s => parseInt(s.slot) === slot);
+                if (slotOcupado) {
+                    return this.showError(`⚠️ El Slot ${slot} ya está ocupado por ${slotOcupado.placa}. Elige otro espacio.`);
+                }
+
+                // Verificar si la placa ya existe activa
+                const placaExiste = activos.find(s => s.placa === placa);
+                if (placaExiste) {
+                    return this.showError(`⚠️ La placa ${placa} ya está registrada en el Slot ${placaExiste.slot}.`);
+                }
 
                 window.dispatchEvent(new CustomEvent('add-service', {
                     detail: { placa, tipo, slot, id: Date.now(), estado: 'activo', entrada: new Date().toISOString() }
@@ -161,7 +212,7 @@ export class EntryForm extends HTMLElement {
             this.clear();
         };
 
-        // Botón cancelar en modo edición
+        // Botón cancelar
         const cancelBtn = this.shadowRoot.getElementById('cancelBtn');
         if (cancelBtn) cancelBtn.onclick = () => this.clear();
 

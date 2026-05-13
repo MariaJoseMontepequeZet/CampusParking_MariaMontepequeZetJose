@@ -4,15 +4,42 @@ import './components/EntryForm.js';
 import './components/SlotsGrid.js';
 import './components/IncomeReports.js';
 import './components/UserProfile.js';
+import './components/LoginPage.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     CampusStorage.init();
+
+    const appContainer = document.querySelector('.app-container');
     const mainContent = document.getElementById('main-content');
 
     const refreshSystem = () => {
         window.dispatchEvent(new CustomEvent('storage-update'));
     };
 
+    // ===== VERIFICAR SESIÓN =====
+    const isLoggedIn = () => sessionStorage.getItem('cp_logged_in') === 'true';
+
+    const showLogin = () => {
+        // Ocultar la app y mostrar login
+        appContainer.style.display = 'none';
+        // Remover login anterior si existe
+        const oldLogin = document.querySelector('login-page');
+        if (oldLogin) oldLogin.remove();
+        // Crear login
+        const login = document.createElement('login-page');
+        document.body.appendChild(login);
+    };
+
+    const showApp = () => {
+        // Remover login si existe
+        const loginEl = document.querySelector('login-page');
+        if (loginEl) loginEl.remove();
+        // Mostrar la app
+        appContainer.style.display = 'block';
+        renderDashboard();
+    };
+
+    // ===== VISTAS =====
     const renderDashboard = () => {
         mainContent.innerHTML = '';
         mainContent.className = 'main-layout';
@@ -45,12 +72,21 @@ document.addEventListener('DOMContentLoaded', () => {
         mainContent.appendChild(document.createElement('user-profile'));
     };
 
-    // Navegación
+    // ===== NAVEGACIÓN =====
     window.addEventListener('show-dashboard', renderDashboard);
     window.addEventListener('open-reports', renderReports);
     window.addEventListener('open-profile', renderProfile);
 
-    // Acciones de Datos
+    // Login exitoso
+    window.addEventListener('login-success', showApp);
+
+    // Logout
+    window.addEventListener('logout', () => {
+        sessionStorage.removeItem('cp_logged_in');
+        showLogin();
+    });
+
+    // ===== ACCIONES DE DATOS =====
     window.addEventListener('add-service', (e) => {
         const services = JSON.parse(localStorage.getItem('cp_services') || '[]');
         services.push(e.detail);
@@ -81,5 +117,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    renderDashboard();
+    // ===== INICIAR =====
+    if (isLoggedIn()) {
+        showApp();
+    } else {
+        showLogin();
+    }
 });
