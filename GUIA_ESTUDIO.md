@@ -1,10 +1,10 @@
-# 📖 Guía de Estudio — Campus Parking
+# Guía de Estudio — Campus Parking
 
 > Esta guía está diseñada para que puedas responder cualquier pregunta técnica sobre el proyecto.
 
 ---
 
-## 🔗 ¿Cómo se conectan los archivos?
+## ¿Cómo se conectan los archivos?
 
 ### Flujo completo desde que abres la página:
 
@@ -30,7 +30,7 @@ index.html
 
 ---
 
-## ❓ Preguntas Frecuentes con Respuestas
+## Preguntas Frecuentes con Respuestas
 
 ### 1. "¿Por qué usas `type="module"` en el script?"
 
@@ -385,7 +385,7 @@ Es un **overlay de pantalla completa** que se renderiza dentro de `<main>`:
 ```
 
 Se cierra de 3 formas:
-1. Botón ✕ → `window.dispatchEvent(new CustomEvent('show-dashboard'))`
+1. Botón  → `window.dispatchEvent(new CustomEvent('show-dashboard'))`
 2. Clic fuera del modal → mismo evento
 3. Cerrar sesión → `window.dispatchEvent(new CustomEvent('logout'))`
 
@@ -414,14 +414,14 @@ Cada servicio en `cp_services` tiene un campo `estado`:
 
 | Estado | Significado | ¿Tiene slot? | ¿Aparece en grilla? | ¿Aparece en reportes? |
 |--------|------------|:------------:|:-------------------:|:---------------------:|
-| `activo` | Vehículo estacionado | ✅ Sí | ✅ Sí | ❌ No |
-| `finalizado` | Ya se fue y pagó | ❌ No (null) | ❌ No | ✅ Sí |
+| `activo` | Vehículo estacionado |  Sí |  Sí |  No |
+| `finalizado` | Ya se fue y pagó |  No (null) |  No |  Sí |
 
 Cuando das salida, el servicio cambia de `activo` a `finalizado`, se le asigna `slot: null`, y se le agrega `salida` (hora de salida) y `total` (monto cobrado).
 
 ---
 
-## 🗂️ Resumen de Tecnologías Usadas
+## Resumen de Tecnologías Usadas
 
 | Tecnología | Para qué se usa |
 |------------|----------------|
@@ -438,4 +438,4 @@ Cuando das salida, el servicio cambia de `activo` a `finalizado`, se le asigna `
 
 ---
 
-*Si estudias esta guía y el README.md, podrás responder cualquier pregunta sobre el código. 💪*
+*Si estudias esta guía y el README.md, podrás responder cualquier pregunta sobre el código. *

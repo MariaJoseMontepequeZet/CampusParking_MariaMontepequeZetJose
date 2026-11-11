@@ -1,4 +1,5 @@
 import { translations, getLang } from '../i18n.js';
+import { TOTAL_SLOTS } from '../config.js';
 
 export class SlotsGrid extends HTMLElement {
     constructor() {
@@ -8,34 +9,37 @@ export class SlotsGrid extends HTMLElement {
 
     connectedCallback() {
         this.render();
-        // Escucha cambios para refrescarse solo
-        window.addEventListener('storage-update', () => this.render());
+        window.addEventListener('storage-update', this.onUpdate);
     }
+
+    disconnectedCallback() {
+        window.removeEventListener('storage-update', this.onUpdate);
+    }
+
+    onUpdate = () => this.render();
 
     render() {
         const t = translations[getLang()] || translations['es'];
         const services = JSON.parse(localStorage.getItem('cp_services') || '[]');
-        const activos = services.filter(s => s.estado === 'activo');
+        const activos = services.filter((s) => s.estado === 'activo');
 
-        // Mapeo de íconos por tipo
-        const icons = {
-            "Automóvil": "🚗",
-            "Moto": "🏍️",
-            "Camioneta": "🚙",
-            "Bicicleta": "🚲",
-            "Scooter": "🛴"
+        const typeLabels = {
+            Automóvil: t.type_automovil,
+            Moto: t.type_moto,
+            Camioneta: t.type_camioneta,
+            Bicicleta: t.type_bicicleta,
+            Scooter: t.type_scooter,
         };
 
         let html = '';
-        // Iteramos hasta 50 (o más, según tu diseño)
-        for (let i = 1; i <= 50; i++) {
-            const s = activos.find(item => parseInt(item.slot) === i);
-            const icon = s ? (icons[s.tipo] || '🚗') : '◌';
+        for (let i = 1; i <= TOTAL_SLOTS; i++) {
+            const s = activos.find((item) => parseInt(item.slot) === i);
+            const typeLabel = s ? typeLabels[s.tipo] || s.tipo : '';
 
             html += `
                 <div class="slot ${s ? 'occupied' : 'free'}" data-slot="${i}">
                     <span class="num">${i}</span>
-                    <div class="icon">${icon}</div>
+                    <div class="type">${typeLabel}</div>
                     <span class="plate">${s ? s.placa : t.slot_free}</span>
                 </div>`;
         }
@@ -47,10 +51,10 @@ export class SlotsGrid extends HTMLElement {
             </div>`;
 
         // Evento para editar/dar salida
-        this.shadowRoot.querySelectorAll('.occupied').forEach(el => {
+        this.shadowRoot.querySelectorAll('.occupied').forEach((el) => {
             el.onclick = () => {
                 const slotNum = parseInt(el.dataset.slot);
-                const s = activos.find(item => parseInt(item.slot) === slotNum);
+                const s = activos.find((item) => parseInt(item.slot) === slotNum);
                 const form = document.querySelector('entry-form');
                 if (form) form.editMode = s;
             };

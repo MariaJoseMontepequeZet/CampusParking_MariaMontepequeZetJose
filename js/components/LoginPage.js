@@ -21,7 +21,7 @@ export class LoginPage extends HTMLElement {
             <div class="login-overlay">
                 <div class="login-card">
                     <div class="login-header">
-                        <div class="login-logo">🅿️</div>
+                        <div class="login-logo">P</div>
                         <h1>CAMPUS<span>PARKING</span></h1>
                         <p class="login-subtitle">${t.login_subtitle}</p>
                     </div>
@@ -37,7 +37,7 @@ export class LoginPage extends HTMLElement {
                         <div class="password-group">
                             <input type="password" id="password" placeholder="${t.login_placeholder_password}" 
                                    value="${savedPass}" autocomplete="current-password" required>
-                            <button type="button" id="togglePass" class="toggle-pass">👁️</button>
+                            <button type="button" id="togglePass" class="toggle-pass">${t.login_password_show}</button>
                         </div>
 
                         <div class="remember-row">
@@ -66,10 +66,10 @@ export class LoginPage extends HTMLElement {
         toggleBtn.onclick = () => {
             if (passInput.type === 'password') {
                 passInput.type = 'text';
-                toggleBtn.textContent = '🙈';
+                toggleBtn.textContent = t.login_password_hide;
             } else {
                 passInput.type = 'password';
-                toggleBtn.textContent = '👁️';
+                toggleBtn.textContent = t.login_password_show;
             }
         };
 
@@ -110,7 +110,9 @@ export class LoginPage extends HTMLElement {
         errorMsg.style.animation = 'none';
         errorMsg.offsetHeight;
         errorMsg.style.animation = 'shakeLogin 0.4s ease';
-        setTimeout(() => { errorMsg.style.display = 'none'; }, 5000);
+        setTimeout(() => {
+            errorMsg.style.display = 'none';
+        }, 5000);
     }
 }
 

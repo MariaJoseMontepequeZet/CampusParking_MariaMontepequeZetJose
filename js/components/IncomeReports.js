@@ -13,31 +13,36 @@ export class IncomeReports extends HTMLElement {
     render() {
         const t = translations[getLang()] || translations['es'];
         const services = JSON.parse(localStorage.getItem('cp_services')) || [];
-        const pagos = services.filter(s => s.estado === 'finalizado');
+        const pagos = services.filter((s) => s.estado === 'finalizado');
 
-        const totalGlobal = pagos.reduce((acc, s) => acc + parseFloat(s.total || s.costo || 0), 0).toFixed(2);
+        const totalGlobal = pagos
+            .reduce((acc, s) => acc + parseFloat(s.total || s.costo || 0), 0)
+            .toFixed(2);
 
         const typeLabels = {
-            'Automóvil': t.type_automovil,
-            'Moto': t.type_moto,
-            'Camioneta': t.type_camioneta,
-            'Bicicleta': t.type_bicicleta,
-            'Scooter': t.type_scooter
+            Automóvil: t.type_automovil,
+            Moto: t.type_moto,
+            Camioneta: t.type_camioneta,
+            Bicicleta: t.type_bicicleta,
+            Scooter: t.type_scooter,
         };
         const tipos = ['Automóvil', 'Moto', 'Camioneta', 'Bicicleta', 'Scooter'];
-        const stats = tipos.map(tipo => {
-            const suma = pagos.filter(s => s.tipo === tipo)
-                .reduce((acc, s) => acc + parseFloat(s.total || s.costo || 0), 0).toFixed(2);
+        const stats = tipos.map((tipo) => {
+            const suma = pagos
+                .filter((s) => s.tipo === tipo)
+                .reduce((acc, s) => acc + parseFloat(s.total || s.costo || 0), 0)
+                .toFixed(2);
             return { tipo, label: typeLabels[tipo], suma };
         });
 
-        const translateTipo = (tipo) => ({
-            'Automóvil': t.type_automovil,
-            'Moto': t.type_moto,
-            'Camioneta': t.type_camioneta,
-            'Bicicleta': t.type_bicicleta,
-            'Scooter': t.type_scooter
-        }[tipo] || tipo);
+        const translateTipo = (tipo) =>
+            ({
+                Automóvil: t.type_automovil,
+                Moto: t.type_moto,
+                Camioneta: t.type_camioneta,
+                Bicicleta: t.type_bicicleta,
+                Scooter: t.type_scooter,
+            })[tipo] || tipo;
 
         // Función para formatear hora
         const locale = getLang() === 'en' ? 'en-US' : 'es-GT';
@@ -45,13 +50,21 @@ export class IncomeReports extends HTMLElement {
         const formatTime = (iso) => {
             if (!iso) return '--:--';
             const d = new Date(iso);
-            return d.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: true });
+            return d.toLocaleTimeString(locale, {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true,
+            });
         };
 
         const formatDate = (iso) => {
             if (!iso) return '--/--/--';
             const d = new Date(iso);
-            return d.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: '2-digit' });
+            return d.toLocaleDateString(locale, {
+                day: '2-digit',
+                month: '2-digit',
+                year: '2-digit',
+            });
         };
 
         // Calcular duración entre entrada y salida
@@ -76,12 +89,16 @@ export class IncomeReports extends HTMLElement {
                         <h3>${t.report_total_accumulated}</h3>
                         <div class="amount">Q${totalGlobal}</div>
                     </div>
-                    ${stats.map(s => `
+                    ${stats
+                        .map(
+                            (s) => `
                         <div class="report-card">
                             <h3>${s.label}</h3>
                             <div class="amount">Q${s.suma}</div>
                         </div>
-                    `).join('')}
+                    `,
+                        )
+                        .join('')}
                 </div>
 
                 <div style="margin-top: 40px;">
@@ -100,9 +117,12 @@ export class IncomeReports extends HTMLElement {
                                 </tr>
                             </thead>
                             <tbody>
-                                ${pagos.length === 0 ?
-                `<tr><td colspan="7" style="text-align:center; padding:30px; opacity:0.5;">${t.report_no_transactions}</td></tr>` :
-                pagos.map(p => `
+                                ${
+                                    pagos.length === 0
+                                        ? `<tr><td colspan="7" style="text-align:center; padding:30px; opacity:0.5;">${t.report_no_transactions}</td></tr>`
+                                        : pagos
+                                              .map(
+                                                  (p) => `
                                     <tr style="border-bottom: 1px solid rgba(157, 78, 221, 0.1); transition: 0.3s;" onmouseover="this.style.background='rgba(157,78,221,0.05)'" onmouseout="this.style.background='transparent'">
                                         <td style="padding: 12px 8px; font-weight: bold;">${p.placa}</td>
                                         <td style="padding: 12px 8px;">${translateTipo(p.tipo)}</td>
@@ -112,7 +132,10 @@ export class IncomeReports extends HTMLElement {
                                         <td style="padding: 12px 8px; text-align: center; color: #b0a0ca; font-size: 0.8rem;">${calcDuration(p.entrada, p.salida)}</td>
                                         <td style="padding: 12px 8px; text-align: right; color: #deff9a; font-weight: 800;">Q${parseFloat(p.total || p.costo).toFixed(2)}</td>
                                     </tr>
-                                `).join('')}
+                                `,
+                                              )
+                                              .join('')
+                                }
                             </tbody>
                         </table>
                     </div>
@@ -121,4 +144,6 @@ export class IncomeReports extends HTMLElement {
         `;
     }
 }
-customElements.define('income-reports', IncomeReports);
+if (!customElements.get('income-reports')) {
+    customElements.define('income-reports', IncomeReports);
+}
