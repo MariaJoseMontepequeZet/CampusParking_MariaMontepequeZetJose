@@ -1,4 +1,5 @@
 import { translations, getLang } from '../i18n.js';
+import { TOTAL_SLOTS } from '../config.js';
 
 export class AppNav extends HTMLElement {
     constructor() {
@@ -8,24 +9,30 @@ export class AppNav extends HTMLElement {
 
     connectedCallback() {
         this.render();
-        window.addEventListener('storage-update', () => {
-            this.render();
-        });
+        window.addEventListener('storage-update', this.onUpdate);
     }
+
+    disconnectedCallback() {
+        window.removeEventListener('storage-update', this.onUpdate);
+    }
+
+    onUpdate = () => this.render();
 
     render() {
         const t = translations[getLang()] || translations['es'];
         const services = JSON.parse(localStorage.getItem('cp_services')) || [];
         const user = JSON.parse(localStorage.getItem('cp_user') || '{}');
 
-        // FILTRO DE SEGURIDAD: 
+        // FILTRO DE SEGURIDAD:
         // 1. Que el estado sea 'activo'.
         // 2. Que tenga un slot asignado (que no sea null o undefined).
-        const activos = services.filter(s => s.estado === 'activo' && s.slot !== null && s.slot !== undefined);
+        const activos = services.filter(
+            (s) => s.estado === 'activo' && s.slot !== null && s.slot !== undefined,
+        );
 
         // Función de conteo exacta
         const getCount = (tipo) => {
-            return activos.filter(s => s.tipo && s.tipo.trim() === tipo).length;
+            return activos.filter((s) => s.tipo && s.tipo.trim() === tipo).length;
         };
 
         this.shadowRoot.innerHTML = `
@@ -60,7 +67,7 @@ export class AppNav extends HTMLElement {
 
                 <div class="stats-container counter-box">
                     <div class="stat-item">
-                        <span class="stat-value" style="color: #4ade80;">${50 - activos.length}</span>
+                        <span class="stat-value" style="color: #4ade80;">${TOTAL_SLOTS - activos.length}</span>
                         <span class="stat-label">${t.nav_empty}</span>
                     </div>
                     <div class="stat-item">
@@ -77,26 +84,35 @@ export class AppNav extends HTMLElement {
                     
                     <button id="btnProfile" class="user-profile-btn">
                         <span class="user-name">${user.nombre || t.profile_default_name}</span>
-                        <div class="avatar">👤</div>
+                        <div class="avatar"></div>
                     </button>
                 </div>
             </nav>
         `;
+
+        const displayName = user.nombre || t.profile_default_name;
+        this.shadowRoot.querySelector('.avatar').textContent = displayName.charAt(0).toUpperCase();
 
         this.setupListeners();
     }
 
     setupListeners() {
         this.shadowRoot.getElementById('btnHome').onclick = () => {
-            window.dispatchEvent(new CustomEvent('show-dashboard', { bubbles: true, composed: true }));
+            window.dispatchEvent(
+                new CustomEvent('show-dashboard', { bubbles: true, composed: true }),
+            );
         };
 
         this.shadowRoot.getElementById('btnReports').onclick = () => {
-            window.dispatchEvent(new CustomEvent('open-reports', { bubbles: true, composed: true }));
+            window.dispatchEvent(
+                new CustomEvent('open-reports', { bubbles: true, composed: true }),
+            );
         };
 
         this.shadowRoot.getElementById('btnProfile').onclick = () => {
-            window.dispatchEvent(new CustomEvent('open-profile', { bubbles: true, composed: true }));
+            window.dispatchEvent(
+                new CustomEvent('open-profile', { bubbles: true, composed: true }),
+            );
         };
     }
 }

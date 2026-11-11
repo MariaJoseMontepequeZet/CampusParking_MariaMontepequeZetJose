@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('update-service', (e) => {
         const services = JSON.parse(localStorage.getItem('cp_services') || '[]');
-        const index = services.findIndex(s => s.id === e.detail.id);
+        const index = services.findIndex((s) => s.id === e.detail.id);
         if (index !== -1) {
             services[index] = e.detail;
             localStorage.setItem('cp_services', JSON.stringify(services));
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('exit-service', (e) => {
         const services = JSON.parse(localStorage.getItem('cp_services') || '[]');
-        const index = services.findIndex(s => s.id === e.detail.id);
+        const index = services.findIndex((s) => s.id === e.detail.id);
         if (index !== -1) {
             services[index] = e.detail;
             localStorage.setItem('cp_services', JSON.stringify(services));
