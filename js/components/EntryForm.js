@@ -1,4 +1,5 @@
 import { translations, getLang } from '../i18n.js';
+import { TOTAL_SLOTS } from '../config.js';
 
 export class EntryForm extends HTMLElement {
     constructor() {
@@ -13,16 +14,18 @@ export class EntryForm extends HTMLElement {
         this.render();
     }
 
-    connectedCallback() { this.render(); }
+    connectedCallback() {
+        this.render();
+    }
 
     // Mapeo de prefijo según tipo de vehículo
     getPrefix(tipo) {
         const prefixes = {
-            'Automóvil': 'P',
-            'Moto': 'M',
-            'Camioneta': 'C',
-            'Bicicleta': 'B',
-            'Scooter': 'S'
+            Automóvil: 'P',
+            Moto: 'M',
+            Camioneta: 'C',
+            Bicicleta: 'B',
+            Scooter: 'S',
         };
         return prefixes[tipo] || 'P';
     }
@@ -42,7 +45,9 @@ export class EntryForm extends HTMLElement {
         if (errorBox) {
             errorBox.textContent = msg;
             errorBox.style.display = 'block';
-            setTimeout(() => { errorBox.style.display = 'none'; }, 4000);
+            setTimeout(() => {
+                errorBox.style.display = 'none';
+            }, 4000);
         }
     }
 
@@ -63,7 +68,7 @@ export class EntryForm extends HTMLElement {
             const entrada = new Date(this._selected.entrada);
             const ahora = new Date();
             const hours = Math.max(1, Math.ceil((ahora - entrada) / (1000 * 60 * 60)));
-            const rates = { "Automóvil": 15, "Moto": 5, "Camioneta": 20, "Bicicleta": 2, "Scooter": 3 };
+            const rates = { Automóvil: 15, Moto: 5, Camioneta: 20, Bicicleta: 2, Scooter: 3 };
             const rate = rates[this._selected.tipo] || 10;
             const total = (hours * rate).toFixed(2);
 
@@ -102,19 +107,23 @@ export class EntryForm extends HTMLElement {
                 </div>
                 <span class="hint">${t.form_hint}</span>
 
-                ${!isEdit ? `<label>${t.form_slot}</label><input type="number" id="slot" min="1" max="20">` : ''}
+                ${!isEdit ? `<label>${t.form_slot}</label><input type="number" id="slot" min="1" max="${TOTAL_SLOTS}">` : ''}
                 
                 ${billHTML}
 
                 <button id="mainBtn">${isEdit ? t.btn_update : t.form_btn}</button>
                 
-                ${isEdit ? `
+                ${
+                    isEdit
+                        ? `
                     <button id="exitBtn" style="background:#ff4d4d; color:white; border:none; padding:10px; border-radius:8px; width:100%; margin-top:10px; cursor:pointer; font-weight:bold;">
                         ${t.btn_exit}
                     </button>
                     <button id="cancelBtn" style="background:transparent; color:#b0a0ca; border:none; width:100%; margin-top:5px; cursor:pointer;">
                         ${t.btn_cancel}
-                    </button>` : ''}
+                    </button>`
+                        : ''
+                }
             </div>`;
 
         this.setupEvents(isEdit);
@@ -140,17 +149,26 @@ export class EntryForm extends HTMLElement {
 
         // Validar: solo letras (sin caracteres especiales)
         lettersInput.oninput = () => {
-            lettersInput.value = lettersInput.value.replace(/[^A-Za-z]/g, '').toUpperCase().substring(0, 3);
+            lettersInput.value = lettersInput.value
+                .replace(/[^A-Za-z]/g, '')
+                .toUpperCase()
+                .substring(0, 3);
         };
 
         // Bloquear pegar caracteres especiales
         numsInput.onpaste = (e) => {
             const text = (e.clipboardData || window.clipboardData).getData('text');
-            if (/[^0-9]/.test(text)) { e.preventDefault(); this.showError(t.form_error_numbers); }
+            if (/[^0-9]/.test(text)) {
+                e.preventDefault();
+                this.showError(t.form_error_numbers);
+            }
         };
         lettersInput.onpaste = (e) => {
             const text = (e.clipboardData || window.clipboardData).getData('text');
-            if (/[^A-Za-z]/.test(text)) { e.preventDefault(); this.showError(t.form_error_letters); }
+            if (/[^A-Za-z]/.test(text)) {
+                e.preventDefault();
+                this.showError(t.form_error_letters);
+            }
         };
 
         // Botón principal (registrar / actualizar)
@@ -175,40 +193,65 @@ export class EntryForm extends HTMLElement {
 
             // Obtener servicios activos para validar duplicados
             const services = JSON.parse(localStorage.getItem('cp_services') || '[]');
-            const activos = services.filter(s => s.estado === 'activo');
+            const activos = services.filter((s) => s.estado === 'activo');
 
             if (isEdit) {
                 // Al actualizar, verificar que la nueva placa no esté en uso por OTRO vehículo
-                const placaDuplicada = activos.find(s => s.placa === placa && s.id !== this._selected.id);
+                const placaDuplicada = activos.find(
+                    (s) => s.placa === placa && s.id !== this._selected.id,
+                );
                 if (placaDuplicada) {
-                    return this.showError(t.form_error_slot_occupied.replace('{slot}', placaDuplicada.slot).replace('{placa}', placa));
+                    return this.showError(
+                        t.form_error_plate_duplicate
+                            .replace('{slot}', placaDuplicada.slot)
+                            .replace('{placa}', placa),
+                    );
                 }
 
-                window.dispatchEvent(new CustomEvent('update-service', {
-                    detail: { ...this._selected, placa, tipo }
-                }));
+                window.dispatchEvent(
+                    new CustomEvent('update-service', {
+                        detail: { ...this._selected, placa, tipo },
+                    }),
+                );
             } else {
                 const slot = parseInt(this.shadowRoot.getElementById('slot').value);
 
-                if (!slot || slot < 1 || slot > 20) {
-                    return this.showError('⚠️ Selecciona un espacio válido (1-20).');
+                if (!slot || slot < 1 || slot > TOTAL_SLOTS) {
+                    return this.showError(t.form_error_slot_invalid.replace('{max}', TOTAL_SLOTS));
                 }
 
                 // Verificar si el slot ya está ocupado
-                const slotOcupado = activos.find(s => parseInt(s.slot) === slot);
+                const slotOcupado = activos.find((s) => parseInt(s.slot) === slot);
                 if (slotOcupado) {
-                    return this.showError(t.form_error_slot_occupied.replace('{slot}', slot).replace('{placa}', slotOcupado.placa));
+                    return this.showError(
+                        t.form_error_slot_occupied
+                            .replace('{slot}', slot)
+                            .replace('{placa}', slotOcupado.placa),
+                    );
                 }
 
                 // Verificar si la placa ya existe activa
-                const placaExiste = activos.find(s => s.placa === placa);
+                const placaExiste = activos.find((s) => s.placa === placa);
                 if (placaExiste) {
-                    return this.showError(t.form_error_slot_occupied.replace('{slot}', placaExiste.slot).replace('{placa}', placa));
+                    return this.showError(
+                        t.form_error_plate_duplicate
+                            .replace('{slot}', placaExiste.slot)
+                            .replace('{placa}', placa),
+                    );
                 }
 
-                window.dispatchEvent(new CustomEvent('add-service', {
-                    detail: { placa, tipo, slot, id: Date.now(), estado: 'activo', entrada: new Date().toISOString() }
-                }));
+                window.dispatchEvent(
+                    new CustomEvent('add-service', {
+                        detail: {
+                            placa,
+                            tipo,
+                            slot,
+                            id: Date.now(),
+                            estado: 'activo',
+                            entrada: new Date().toISOString(),
+                        },
+                    }),
+                );
             }
             this.clear();
         };
@@ -219,22 +262,28 @@ export class EntryForm extends HTMLElement {
 
         // Botón dar salida
         const exitBtn = this.shadowRoot.getElementById('exitBtn');
-        if (exitBtn) exitBtn.onclick = () => {
-            const rates = { "Automóvil": 15, "Moto": 5, "Camioneta": 20, "Bicicleta": 2, "Scooter": 3 };
-            const rate = rates[this._selected.tipo] || 10;
-            const hours = Math.max(1, Math.ceil((new Date() - new Date(this._selected.entrada)) / (1000 * 60 * 60)));
+        if (exitBtn)
+            exitBtn.onclick = () => {
+                const rates = { Automóvil: 15, Moto: 5, Camioneta: 20, Bicicleta: 2, Scooter: 3 };
+                const rate = rates[this._selected.tipo] || 10;
+                const hours = Math.max(
+                    1,
+                    Math.ceil((new Date() - new Date(this._selected.entrada)) / (1000 * 60 * 60)),
+                );
 
-            window.dispatchEvent(new CustomEvent('exit-service', {
-                detail: {
-                    ...this._selected,
-                    estado: 'finalizado',
-                    total: (hours * rate).toFixed(2),
-                    salida: new Date().toISOString(),
-                    slot: null
-                }
-            }));
-            this.clear();
-        };
+                window.dispatchEvent(
+                    new CustomEvent('exit-service', {
+                        detail: {
+                            ...this._selected,
+                            estado: 'finalizado',
+                            total: (hours * rate).toFixed(2),
+                            salida: new Date().toISOString(),
+                            slot: null,
+                        },
+                    }),
+                );
+                this.clear();
+            };
     }
 
     clear() {

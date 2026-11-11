@@ -1,45 +1,47 @@
-# 🅿️ Campus Parking — Sistema de Administración de Parqueadero
+# Campus Parking — Sistema de Administración de Parqueadero
 
 > Aplicación web para la gestión de un parqueadero universitario. Permite registrar vehículos, calcular costos por tiempo de permanencia, administrar slots y generar reportes de ganancias.
 
 **Propietario:** Campus Parking  
 **Desarrolladora:** María José Montepeque Zet  
 **Tecnologías:** HTML5, CSS3, JavaScript (ES6 Modules), Web Components, localStorage
+**Herramientas de desarrollo:** ESLint, Prettier, EditorConfig
 
 ---
 
-## 📋 Tabla de Contenidos
+## Tabla de Contenidos
 
-1. [Características](#-características)
-2. [Requisitos de Ejecución](#-requisitos-de-ejecución)
-3. [Cómo Ejecutar el Proyecto](#-cómo-ejecutar-el-proyecto)
-4. [Credenciales de Acceso](#-credenciales-de-acceso)
-5. [Estructura del Proyecto](#-estructura-del-proyecto)
-6. [Descripción de Archivos](#-descripción-de-archivos)
-7. [Arquitectura del Sistema](#-arquitectura-del-sistema)
-8. [Funcionalidades Detalladas](#-funcionalidades-detalladas)
-9. [Problemas Resueltos](#-problemas-resueltos)
-10. [Formato de Placas](#-formato-de-placas)
-11. [Tarifas por Vehículo](#-tarifas-por-vehículo)
-
----
-
-## ✨ Características
-
-- 🔐 **Login con autenticación** — validación de credenciales con opción de recordar sesión
-- 🚗 **Registro de vehículos** — con prefijo automático por tipo y validación de placa
-- 🅿️ **20 slots visuales** — con iconos por tipo de vehículo y estado ocupado/libre
-- 💰 **Cálculo automático de cobro** — basado en horas de permanencia × tarifa del tipo
-- 📊 **Reportes de ganancias** — con hora de entrada, salida, duración y total por vehículo
-- 👤 **Perfil editable** — cambio de nombre, correo, contraseña e idioma (ES/EN)
-- ⚠️ **Validaciones completas** — slots duplicados, placas duplicadas, caracteres especiales
-- 📱 **Diseño responsive** — adaptado a móvil, tablet y escritorio
-- 🌐 **Internacionalización** — soporte para Español e Inglés
-- 💾 **Persistencia con localStorage** — los datos se mantienen al recargar la página
+1. [Características](#características)
+2. [Requisitos de Ejecución](#requisitos-de-ejecución)
+3. [Cómo Ejecutar el Proyecto](#cómo-ejecutar-el-proyecto)
+4. [Herramientas de Desarrollo](#herramientas-de-desarrollo)
+5. [Credenciales de Acceso](#credenciales-de-acceso)
+6. [Estructura del Proyecto](#estructura-del-proyecto)
+7. [Descripción de Archivos](#descripción-de-archivos)
+8. [Arquitectura del Sistema](#arquitectura-del-sistema)
+9. [Funcionalidades Detalladas](#funcionalidades-detalladas)
+10. [Problemas Resueltos](#problemas-resueltos)
+11. [Formato de Placas](#formato-de-placas)
+12. [Tarifas por Vehículo](#tarifas-por-vehículo)
 
 ---
 
-## 🖥️ Requisitos de Ejecución
+## Características
+
+- **Login con autenticación** — validación de credenciales con opción de recordar sesión
+- **Registro de vehículos** — con prefijo automático por tipo y validación de placa
+- **20 slots visuales** — con etiqueta del tipo de vehículo y estado ocupado/libre
+- **Cálculo automático de cobro** — basado en horas de permanencia × tarifa del tipo
+- **Reportes de ganancias** — con hora de entrada, salida, duración y total por vehículo
+- **Perfil editable** — cambio de nombre, correo, contraseña e idioma (ES/EN)
+- **Validaciones completas** — slots duplicados, placas duplicadas, caracteres especiales
+- **Diseño responsive** — adaptado a móvil, tablet y escritorio
+- **Internacionalización** — soporte para Español e Inglés
+- **Persistencia con localStorage** — los datos se mantienen al recargar la página
+
+---
+
+## Requisitos de Ejecución
 
 El proyecto utiliza **ES6 Modules** (`<script type="module">`), lo cual **requiere un servidor HTTP** para funcionar correctamente. Abrir el archivo `index.html` directamente con `file:///` **no funcionará** debido a restricciones de seguridad CORS del navegador.
 
@@ -53,7 +55,7 @@ El proyecto utiliza **ES6 Modules** (`<script type="module">`), lo cual **requie
 
 ---
 
-## 🚀 Cómo Ejecutar el Proyecto
+## Cómo Ejecutar el Proyecto
 
 ```bash
 # 1. Clonar el repositorio
@@ -71,7 +73,19 @@ python -m http.server 8080
 
 ---
 
-## 🔑 Credenciales de Acceso
+## Herramientas de Desarrollo
+
+Requiere Node.js. Instalar dependencias una vez con `npm install`.
+
+| Comando | Descripción |
+|---------|-------------|
+| `npm run lint` | Revisa el código con ESLint |
+| `npm run format` | Da formato a JS, CSS, HTML y JSON con Prettier |
+| `npm run format:check` | Verifica el formato sin modificar archivos |
+
+---
+
+## Credenciales de Acceso
 
 | Campo | Valor |
 |-------|-------|
@@ -85,13 +99,17 @@ python -m http.server 8080
 
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 CampusParking_MariaMontepequeZetJose/
 │
 ├── index.html                  # Página principal (punto de entrada)
 ├── README.md                   # Documentación del proyecto
+├── package.json                # Scripts de lint y formato
+├── eslint.config.js            # Reglas de ESLint
+├── .prettierrc.json            # Reglas de Prettier
+├── .editorconfig               # Estilo de edición compartido
 │
 ├── css/                        # Hojas de estilo
 │   ├── style.css               # Estilos globales y layout principal
@@ -100,12 +118,11 @@ CampusParking_MariaMontepequeZetJose/
 │   ├── slots-grid.css          # Estilos del grid de slots/espacios
 │   ├── login.css               # Estilos de la página de login
 │   ├── profile.css             # Estilos del modal de perfil
-│   ├── reports.css             # Estilos de los reportes de ganancias
-│   ├── billing-card.css        # Estilos de tarjeta de facturación
-│   └── edit-service.css        # Estilos del formulario de edición
+│   └── reports.css             # Estilos de los reportes de ganancias
 │
 └── js/                         # Lógica de la aplicación
     ├── app.js                  # Controlador principal (Event Bus)
+    ├── config.js               # Constantes compartidas (total de slots)
     ├── storage.js              # Inicialización de localStorage
     ├── i18n.js                 # Sistema de internacionalización (ES/EN)
     │
@@ -115,16 +132,14 @@ CampusParking_MariaMontepequeZetJose/
         ├── SlotsGrid.js        # Grilla visual de 20 espacios
         ├── EntryForm.js        # Formulario de registro/edición
         ├── IncomeReports.js    # Reportes de ganancias e historial
-        ├── UserProfile.js      # Modal de perfil de usuario
-        ├── BillingCard.js      # Tarjeta de facturación
-        └── EditService.js      # Formulario de edición de servicio
+        └── UserProfile.js      # Modal de perfil de usuario
 ```
 
 ---
 
-## 📄 Descripción de Archivos
+## Descripción de Archivos
 
-### 🟢 `index.html` — Punto de Entrada
+### `index.html` — Punto de Entrada
 
 Página HTML principal que carga los estilos globales y el módulo JavaScript principal. Contiene la estructura base de la aplicación:
 
@@ -134,7 +149,7 @@ Página HTML principal que carga los estilos globales y el módulo JavaScript pr
 
 ---
 
-### 🟣 Archivos JavaScript
+### Archivos JavaScript
 
 #### `js/app.js` — Controlador Principal
 
@@ -185,7 +200,7 @@ Componente que se muestra al inicio de la aplicación. Características:
 
 - Lee credenciales desde `localStorage` (`cp_user`) para validar dinámicamente
 - **"Recordar credenciales"**: guarda email y contraseña en `localStorage`
-- Botón de **ver/ocultar contraseña** (👁️/🙈)
+- Botón de **mostrar/ocultar contraseña**
 - Mensajes de error con **animación shake**
 - Si las credenciales son correctas → guarda sesión en `sessionStorage` y dispara `login-success`
 
@@ -209,7 +224,7 @@ Barra superior que muestra:
 
 Renderiza una cuadrícula de **20 slots** con:
 
-- **Iconos por tipo**: 🚗 Auto, 🏍️ Moto, 🚙 Camioneta, 🚲 Bicicleta, 🛴 Scooter
+- **Etiqueta por tipo**: Automóvil, Moto, Camioneta, Bicicleta o Scooter (traducida al idioma activo)
 - **Estado visual**: slot ocupado (morado con borde) vs libre (translúcido)
 - **Placa visible** en cada slot ocupado
 - **Clic en slot ocupado** → abre el formulario de edición con los datos del vehículo
@@ -236,13 +251,13 @@ Componente dual que funciona en **modo inserción** y **modo edición**.
 - Botón "Cancelar"
 
 **Validaciones implementadas:**
-1. ⚠️ Solo se admiten **números** en el campo de dígitos — sin caracteres especiales
-2. ⚠️ Solo se admiten **letras** en el campo de letras — sin caracteres especiales
-3. ⚠️ **Exactamente 3 dígitos** y **3 letras** obligatorios
-4. ⚠️ **Slot ocupado** → `"El Slot X ya está ocupado por PLACA. Elige otro espacio."`
-5. ⚠️ **Placa duplicada** → `"La placa X ya está registrada en el Slot Y."`
-6. ⚠️ **Bloqueo de pegado** de caracteres especiales
-7. ⚠️ **Auto-focus**: al completar 3 números, salta automáticamente al campo de letras
+1. Solo se admiten **números** en el campo de dígitos — sin caracteres especiales
+2. Solo se admiten **letras** en el campo de letras — sin caracteres especiales
+3. **Exactamente 3 dígitos** y **3 letras** obligatorios
+4. **Slot ocupado** → `"El Slot X ya está ocupado por PLACA. Elige otro espacio."`
+5. **Placa duplicada** → `"La placa X ya está registrada en el Slot Y."`
+6. **Bloqueo de pegado** de caracteres especiales
+7. **Auto-focus**: al completar 3 números, salta automáticamente al campo de letras
 
 Los mensajes de error se muestran **inline** con una animación shake en rojo, sin usar `alert()`.
 
@@ -287,7 +302,7 @@ Los cambios se guardan en `localStorage` (`cp_user`) y se actualizan en toda la 
 
 ---
 
-### 🔵 Archivos CSS
+### Archivos CSS
 
 #### `css/style.css` — Estilos Globales
 
@@ -324,7 +339,7 @@ Los cambios se guardan en `localStorage` (`cp_user`) y se actualizan en toda la 
 #### `css/profile.css` — Perfil Modal
 
 - Overlay con `backdrop-filter: blur(8px)` y fondo oscuro semi-transparente
-- Modal con scroll interno, botón de cerrar (✕) y secciones separadas
+- Modal con scroll interno, botón de cerrar y secciones separadas
 - Mensajes de éxito (verde) y error (rojo) con estilo diferenciado
 - Botón de logout con estilo rojo sutil
 
@@ -337,7 +352,7 @@ Los cambios se guardan en `localStorage` (`cp_user`) y se actualizan en toda la 
 
 ---
 
-## 🏗️ Arquitectura del Sistema
+## Arquitectura del Sistema
 
 ```
 ┌──────────────────────────────────────────────┐
@@ -387,7 +402,7 @@ Los cambios se guardan en `localStorage` (`cp_user`) y se actualizan en toda la 
 
 ---
 
-## 🔧 Funcionalidades Detalladas
+## Funcionalidades Detalladas
 
 ### Login
 
@@ -427,7 +442,7 @@ Los cambios se guardan en `localStorage` (`cp_user`) y se actualizan en toda la 
 
 ---
 
-## 🐛 Problemas Resueltos
+## Problemas Resueltos
 
 ### 1. Botón de Perfil no clickeable
 
@@ -459,9 +474,27 @@ Los cambios se guardan en `localStorage` (`cp_user`) y se actualizan en toda la 
 
 **Solución:** Se agregaron media queries en todos los CSS de los componentes con breakpoints a 768px y 420px.
 
+### 6. Cantidad de slots inconsistente
+
+**Problema:** La grilla y el contador de la barra mostraban 50 slots, mientras el formulario aceptaba solo del 1 al 20.
+
+**Solución:** Se creó `js/config.js` con la constante `TOTAL_SLOTS = 20`, usada por la grilla, la barra de navegación y el formulario.
+
+### 7. Listeners acumulados en `window`
+
+**Problema:** `SlotsGrid` y `AppNav` registraban un listener de `storage-update` en cada conexión y nunca lo quitaban, de modo que cada cambio de vista dejaba renders huérfanos.
+
+**Solución:** Se guarda el handler y se elimina en `disconnectedCallback`.
+
+### 8. Mensaje incorrecto al duplicar una placa
+
+**Problema:** Registrar una placa ya existente mostraba "El Slot X ya está ocupado", aunque el slot elegido estaba libre.
+
+**Solución:** Se agregó el mensaje `form_error_plate_duplicate` (ES/EN) para ese caso.
+
 ---
 
-## 🔤 Formato de Placas
+## Formato de Placas
 
 El formato de placa es: **`PREFIJO-000XXX`**
 
@@ -479,7 +512,7 @@ El formato de placa es: **`PREFIJO-000XXX`**
 
 ---
 
-## 💰 Tarifas por Vehículo
+## Tarifas por Vehículo
 
 | Tipo | Tarifa por Hora (Q) |
 |------|:-------------------:|
@@ -493,7 +526,7 @@ El cobro se calcula como: **`ceil(horas_de_permanencia) × tarifa`** (mínimo 1 
 
 ---
 
-## 📱 Responsive Design
+## Responsive Design
 
 | Breakpoint | Adaptaciones |
 |:----------:|:-------------|
@@ -504,10 +537,10 @@ El cobro se calcula como: **`ceil(horas_de_permanencia) × tarifa`** (mínimo 1 
 
 ---
 
-## 📄 Licencia
+## Licencia
 
 Este proyecto fue desarrollado como parte del programa académico de Campus Parking.
 
 ---
 
-*Desarrollado con ❤️ por María José Montepeque Zet*
+*Desarrollado por María José Montepeque Zet*

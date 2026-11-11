@@ -6,7 +6,9 @@ export class UserProfile extends HTMLElement {
         this.attachShadow({ mode: 'open' });
     }
 
-    connectedCallback() { this.render(); }
+    connectedCallback() {
+        this.render();
+    }
 
     showMsg(id, msg, isError = false) {
         const el = this.shadowRoot.getElementById(id);
@@ -14,7 +16,9 @@ export class UserProfile extends HTMLElement {
             el.textContent = msg;
             el.className = isError ? 'msg msg-error' : 'msg msg-success';
             el.style.display = 'block';
-            setTimeout(() => { el.style.display = 'none'; }, 3000);
+            setTimeout(() => {
+                el.style.display = 'none';
+            }, 3000);
         }
     }
 
@@ -26,11 +30,11 @@ export class UserProfile extends HTMLElement {
             <link rel="stylesheet" href="css/profile.css">
             <div class="profile-overlay" id="profileOverlay">
                 <div class="profile-modal">
-                    <button class="close-btn" id="closeBtn">✕</button>
+                    <button class="close-btn" id="closeBtn" aria-label="${t.profile_close}">&times;</button>
                     
                     <!-- Header del perfil -->
                     <div class="profile-header">
-                        <div class="profile-avatar-big">👤</div>
+                        <div class="profile-avatar-big"></div>
                         <h2 id="displayName">${user.nombre || t.profile_default_name}</h2>
                         <p class="profile-email" id="displayEmail">${user.email || 'admin@campusparking.com'}</p>
                     </div>
@@ -71,6 +75,11 @@ export class UserProfile extends HTMLElement {
                 </div>
             </div>
         `;
+
+        const displayName = user.nombre || t.profile_default_name;
+        this.shadowRoot.querySelector('.profile-avatar-big').textContent = displayName
+            .charAt(0)
+            .toUpperCase();
 
         this.setupEvents();
     }
@@ -113,10 +122,13 @@ export class UserProfile extends HTMLElement {
 
             // Cambiar contraseña solo si se llenaron ambos campos
             if (currentPass || newPass) {
-                if (!currentPass) return this.showMsg('profileMsg', t.profile_enter_current_password, true);
-                if (currentPass !== user.password) return this.showMsg('profileMsg', t.profile_invalid_current_password, true);
+                if (!currentPass)
+                    return this.showMsg('profileMsg', t.profile_enter_current_password, true);
+                if (currentPass !== user.password)
+                    return this.showMsg('profileMsg', t.profile_invalid_current_password, true);
                 if (!newPass) return this.showMsg('profileMsg', t.profile_enter_new_password, true);
-                if (newPass.length < 4) return this.showMsg('profileMsg', t.profile_invalid_new_password, true);
+                if (newPass.length < 4)
+                    return this.showMsg('profileMsg', t.profile_invalid_new_password, true);
                 updatedUser.password = newPass;
             }
 
@@ -152,4 +164,6 @@ export class UserProfile extends HTMLElement {
     }
 }
 
-customElements.define('user-profile', UserProfile);
+if (!customElements.get('user-profile')) {
+    customElements.define('user-profile', UserProfile);
+}
