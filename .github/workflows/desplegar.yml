@@ -1,0 +1,27 @@
+name: Desplegar en el servidor
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: desplegar-slotspot-api
+  cancel-in-progress: false
+
+jobs:
+  desplegar:
+    runs-on: [self-hosted, slotspot]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copiar el codigo al servidor
+        run: |
+          mkdir -p "$HOME/slotspot/slotspot-mj"
+          rsync -a --delete \
+            --exclude='.git' --exclude='.github' --exclude='node_modules' \
+            --exclude='.env' --exclude='.venv' --exclude='__pycache__' \
+            ./ "$HOME/slotspot/slotspot-mj/"
+
+      - name: Desplegar la API
+        run: $HOME/slotspot/desplegar.sh api
