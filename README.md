@@ -1,4 +1,4 @@
-# Campus Parking — Sistema de Administración de Parqueadero
+# SlotSpot MJ — Sistema de Administración de Parqueadero
 
 > Aplicación web para la gestión de un parqueadero universitario. Permite registrar vehículos, calcular costos por tiempo de permanencia, administrar slots y generar reportes de ganancias.
 
