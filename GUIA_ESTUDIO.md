@@ -1,4 +1,4 @@
-# Guía de Estudio — Campus Parking
+# Guía de Estudio — SlotSpot MJ
 
 > Esta guía está diseñada para que puedas responder cualquier pregunta técnica sobre el proyecto.
 
@@ -284,11 +284,11 @@ this.shadowRoot.innerHTML = `
 
 | Clave | Qué guarda | Ejemplo |
 |-------|------------|---------|
-| `cp_user` | Datos del administrador | `{"nombre":"admin","email":"admin@campusparking.com","password":"Admin123"}` |
+| `cp_user` | Datos del administrador | `{"nombre":"admin","email":"admin@slotspotmj.com","password":"Admin123"}` |
 | `cp_types` | Tipos de vehículos con tarifa | `[{"codigo":"AUT","nombre":"Automóvil","tarifa":"15.00"},...]` |
 | `cp_services` | Todos los servicios (activos y finalizados) | `[{"placa":"P-123ABC","tipo":"Automóvil","slot":1,"estado":"activo",...}]` |
 | `cp_lang` | Idioma seleccionado | `"es"` o `"en"` |
-| `cp_saved_email` | Email guardado (recordar) | `"admin@campusparking.com"` |
+| `cp_saved_email` | Email guardado (recordar) | `"admin@slotspotmj.com"` |
 | `cp_saved_pass` | Password guardado (recordar) | `"Admin123"` |
 
 **Cómo se usa:**

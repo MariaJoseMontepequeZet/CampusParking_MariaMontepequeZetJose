@@ -36,7 +36,7 @@ export class UserProfile extends HTMLElement {
                     <div class="profile-header">
                         <div class="profile-avatar-big"></div>
                         <h2 id="displayName">${user.nombre || t.profile_default_name}</h2>
-                        <p class="profile-email" id="displayEmail">${user.email || 'admin@campusparking.com'}</p>
+                        <p class="profile-email" id="displayEmail">${user.email || 'admin@slotspotmj.com'}</p>
                     </div>
 
                     <div id="profileMsg" class="msg" style="display:none;"></div>

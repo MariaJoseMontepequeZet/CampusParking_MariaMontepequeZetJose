@@ -39,7 +39,7 @@ export class AppNav extends HTMLElement {
             <link rel="stylesheet" href="css/app-nav.css">
             <nav class="navbar">
                 <div class="brand">
-                    <span class="logo-text">CAMPUS<span>PARKING</span></span>
+                    <span class="logo-text">SLOTSPOT<span>MJ</span></span>
                 </div>
                 
                 <div class="stats-container">

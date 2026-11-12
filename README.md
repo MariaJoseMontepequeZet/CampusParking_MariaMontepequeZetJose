@@ -2,7 +2,7 @@
 
 > Aplicación web para la gestión de un parqueadero universitario. Permite registrar vehículos, calcular costos por tiempo de permanencia, administrar slots y generar reportes de ganancias.
 
-**Propietario:** Campus Parking  
+**Propietario:** SlotSpot MJ  
 **Desarrolladora:** María José Montepeque Zet  
 **Tecnologías:** HTML5, CSS3, JavaScript (ES6 Modules), Web Components, localStorage
 **Herramientas de desarrollo:** ESLint, Prettier, EditorConfig
@@ -59,10 +59,10 @@ El proyecto utiliza **ES6 Modules** (`<script type="module">`), lo cual **requie
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/MariaJoseMontepequeZet/CampusParking_MariaMontepequeZetJose.git
+git clone https://github.com/MariaJoseMontepequeZet/slotspot-mj.git
 
 # 2. Entrar al directorio
-cd CampusParking_MariaMontepequeZetJose
+cd slotspot-mj
 
 # 3. Iniciar servidor local
 python -m http.server 8080
@@ -89,7 +89,7 @@ Requiere Node.js. Instalar dependencias una vez con `npm install`.
 
 | Campo | Valor |
 |-------|-------|
-| **Email** | `admin@campusparking.com` |
+| **Email** | `admin@slotspotmj.com` |
 | **Contraseña** | `Admin123` |
 
 > **Nota:** Si los datos del usuario ya existen en tu localStorage de una sesión anterior, debes limpiar el almacenamiento local desde la consola del navegador:
@@ -102,7 +102,7 @@ Requiere Node.js. Instalar dependencias una vez con `npm install`.
 ## Estructura del Proyecto
 
 ```
-CampusParking_MariaMontepequeZetJose/
+slotspot-mj/
 │
 ├── index.html                  # Página principal (punto de entrada)
 ├── README.md                   # Documentación del proyecto
@@ -180,7 +180,7 @@ Crea los datos iniciales en `localStorage` si no existen:
 |-------|-----------|
 | `cp_types` | Tipos de vehículo con código, nombre y tarifa |
 | `cp_services` | Array vacío de servicios |
-| `cp_user` | Usuario admin (`admin@campusparking.com` / `Admin123`) |
+| `cp_user` | Usuario admin (`admin@slotspotmj.com` / `Admin123`) |
 
 ---
 
@@ -210,7 +210,7 @@ Componente que se muestra al inicio de la aplicación. Características:
 
 Barra superior que muestra:
 
-- **Logo** "CAMPUSPARKING"
+- **Logo** "SLOTSPOTMJ"
 - **Contadores por tipo** de vehículo (Autos, Camionetas, Motos, Bicis, Scoots)
 - **Contador de Vacíos/Ocupados** — calculado como `20 - activos.length` (verde) y `activos.length` (rojo)
 - **Botones de navegación**: Inicio y Ganancias
@@ -539,7 +539,7 @@ El cobro se calcula como: **`ceil(horas_de_permanencia) × tarifa`** (mínimo 1 
 
 ## Licencia
 
-Este proyecto fue desarrollado como parte del programa académico de Campus Parking.
+Este proyecto fue desarrollado como parte del programa académico de SlotSpot MJ.
 
 ---
 

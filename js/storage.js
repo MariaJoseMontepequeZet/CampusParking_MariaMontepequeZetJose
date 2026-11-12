@@ -19,7 +19,7 @@ export const CampusStorage = {
         if (!localStorage.getItem('cp_user')) {
             const user = {
                 nombre: 'Administrador',
-                email: 'admin@campusparking.com',
+                email: 'admin@slotspotmj.com',
                 password: 'Admin123',
             };
             localStorage.setItem('cp_user', JSON.stringify(user));

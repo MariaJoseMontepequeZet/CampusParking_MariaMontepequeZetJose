@@ -7,13 +7,13 @@ export const setLang = (lang) => {
 
 export const translations = {
     es: {
-        app_title: 'Campus Parking',
+        app_title: 'SlotSpot MJ',
         login_subtitle: 'Sistema de Administración',
         login_email: 'Correo Electrónico',
         login_password: 'Contraseña',
         login_remember: 'Recordar credenciales',
         login_button: 'INICIAR SESIÓN',
-        login_placeholder_email: 'admin@campusparking.com',
+        login_placeholder_email: 'admin@slotspotmj.com',
         login_placeholder_password: '••••••••',
         login_error_no_email: 'Ingresa tu correo electrónico.',
         login_error_no_password: 'Ingresa tu contraseña.',
@@ -99,13 +99,13 @@ export const translations = {
         profile_default_name: 'Administrador',
     },
     en: {
-        app_title: 'Campus Parking',
+        app_title: 'SlotSpot MJ',
         login_subtitle: 'Administration System',
         login_email: 'Email',
         login_password: 'Password',
         login_remember: 'Remember credentials',
         login_button: 'SIGN IN',
-        login_placeholder_email: 'admin@campusparking.com',
+        login_placeholder_email: 'admin@slotspotmj.com',
         login_placeholder_password: '••••••••',
         login_error_no_email: 'Enter your email address.',
         login_error_no_password: 'Enter your password.',

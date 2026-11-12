@@ -22,7 +22,7 @@ export class LoginPage extends HTMLElement {
                 <div class="login-card">
                     <div class="login-header">
                         <div class="login-logo">P</div>
-                        <h1>CAMPUS<span>PARKING</span></h1>
+                        <h1>SLOTSPOT<span>MJ</span></h1>
                         <p class="login-subtitle">${t.login_subtitle}</p>
                     </div>
 
